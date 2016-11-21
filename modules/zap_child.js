@@ -54,6 +54,7 @@ exports.createReport = function (socket, url, callback) {
 
 	log('Port @ ' + port);
 
+	// /Applications/OWASP.app/Contents/Java/zap.sh -cmd -quickurl http://nodejs.love -quickout ~/test.xml -quickprogress
 	/* OWASP ZAP Child Process Arguments. (Platform Dependent) */
 	var zap_path = "/Applications/OWASP.app/Contents/Java/zap.sh -port " + port;
 	var zap_option = "-quickurl " + url;
