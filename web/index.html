@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Web Security</title>
+        <style>
+/*
+            * {
+                margin: 0px;
+                padding: 0px;
+            }
+*/
+            body {
+                font: 300 15px/1.5 "Helvetica Neue", helvetica, arial, sans-serif;
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+            h3, h4, h5 {
+                margin-top: 0px;
+                margin-bottom: 0px;
+            }
+            .green_button {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
+        </style>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket;
+            window.onload = function () {
+                socket = io.connect(); 
+                
+                socket.on('test_result', function (data) {
+                    $('body').children().last().remove();
+                    $('body').children().last().remove();
+                    data.forEach(function (item, i) {
+                        var output = '';
+                        output += '<h3>' + item.alert + '</h3>';
+                        output += '<h5>Risk Level: ' + item.risklevel + '</h5>';
+                        output += '<h5>Risk Description: ' + item.risktext + '</h5>';
+                        output += '<h5>Description: ' + jQuery(item.description).text() + '</h5>';
+                        item.instances.forEach(function (url, j) {
+                            output += '<h5>Instance: ' + url + '</h5>';
+                        });
+                        output += '<h5>Instance Count: ' + item.count + '</h5>';
+                        output += '<h5>solution: ' + jQuery(item.solution).text() + '</h5>';
+                        output += '<h5>Info: ' + jQuery(item.info).text() + '</h5>';
+                        output += '<h5>Ref: ' + jQuery(item.ref).text() + '</h5>';
+                        $('body').append(output);
+                    });
+                });
+                
+                socket.on('progress_zap_exec', function (err) {
+                    $('body').children().last().remove();
+                    $('body').append('<p>Initializing Test...</p>');
+                });
+                socket.on('progress_zap_test', function (err) {
+                    $('body').children().last().remove();
+                    $('body').append('<p>Performing Test... (THIS MAY TAKE A WHILE)</p>');
+                });
+                socket.on('progress_file_write', function (err) {
+                    $('body').children().last().remove();
+                    $('body').append('<p>Writing New Report...</p>');
+                });
+                socket.on('progress_file_done', function (err) {
+                    $('body').children().last().remove();
+                    $('body').append('<p>Checking Report Status...</p>');
+                });
+                socket.on('progress_report_parse', function (err) {
+                    $('body').children().last().remove();
+                    $('body').append('<p>Getting Report Information...</p>');
+                });
+                socket.on('progress_report_done', function (err) {
+                    $('body').children().last().remove();
+                    $('body').append('<p>Finishing up...</p>');
+                });
+                
+                
+                socket.on('error_zap_crash', function (err) {
+                    alert('Error\nZap crashed.');
+                });
+                socket.on('error_xmlparse_crash', function (err) {
+                    alert('Error\nXML Parse crashed.');
+                });
+                socket.on('error_invalid_url', function () {
+                    alert('Error\nInvalid URL.');
+                });
+                
+                $('#testButton').click(function () {
+                    $('body').append('<img style="display:inline;" src="img/loading.gif" width="50"/>');
+                    $('body').append('<p>Loading...</p>');
+                    socket.emit('test_request', {
+                        url: $("#site").val()
+                    });
+                });
+            };
+        </script>
+	</head>
+	<body>
+		<h2>Welcome to App Protect</h2>
+        <hr>
+        <label>Type website: </label>
+        <input type="text" id="site" />
+        <br><br>
+        <button id="testButton" class="green_button">Test Website</button>
+	</body>
+</html>
