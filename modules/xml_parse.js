@@ -74,7 +74,7 @@ exports.parseXML = function (socket, xmlpath, callback) {
 		if (error) 
 			return callback(new Error(error));
 		else {
-			socket.emit('progress_report_parse');			
+			socket.emit('progress_zap_6_parse_start');			
 			result.OWASPZAPReport.site.forEach(function (site, site_id) { // Multiple site crawls.
 				if (site.alerts[0].alertitem != undefined) {
 					site.alerts[0].alertitem.forEach(function (item, item_id) { // The actual alert items.
@@ -100,7 +100,7 @@ exports.parseXML = function (socket, xmlpath, callback) {
 					});
 				}
 			});
-			socket.emit('progress_report_done');
+			socket.emit('progress_zap_6_parse_done');
 			fs.unlinkSync(xmlpath);
 			return callback(undefined, scan);
 		}

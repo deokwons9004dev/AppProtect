@@ -4,12 +4,6 @@
 		<meta charset="UTF-8">
 		<title>Web Security</title>
         <style>
-/*
-            * {
-                margin: 0px;
-                padding: 0px;
-            }
-*/
             body {
                 font: 300 15px/1.5 "Helvetica Neue", helvetica, arial, sans-serif;
                 margin-left: 20px;
@@ -31,6 +25,23 @@
                 margin: 4px 2px;
                 cursor: pointer;
             }
+            input[type=text] {
+                width: 300px;
+                box-sizing: border-box;
+                border: 2px solid #ccc;
+                border-radius: 4px;
+                font-size: 16px;
+                background-color: white;
+                background-image: url('/img/searchicon.png');
+                background-position: 5px 5px;
+                background-repeat: no-repeat;
+                padding: 12px 20px 12px 40px;
+                -webkit-transition: width 0.4s ease-in-out;
+                transition: width 0.4s ease-in-out;
+            }
+            input[type=text]:focus {
+                width: 500px;
+            }
         </style>
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
@@ -40,8 +51,9 @@
                 socket = io.connect(); 
                 
                 socket.on('test_result', function (data) {
-                    $('body').children().last().remove();
-                    $('body').children().last().remove();
+                    $('#testButton').css('display', 'block');
+                    $('#cancelButton').css('display', 'none');
+                    $('#progress').empty();
                     data.forEach(function (item, i) {
                         var output = '';
                         output += '<h3>' + item.alert + '</h3>';
@@ -55,52 +67,90 @@
                         output += '<h5>solution: ' + jQuery(item.solution).text() + '</h5>';
                         output += '<h5>Info: ' + jQuery(item.info).text() + '</h5>';
                         output += '<h5>Ref: ' + jQuery(item.ref).text() + '</h5>';
-                        $('body').append(output);
+                        $('#result').append(output);
                     });
                 });
                 
-                socket.on('progress_zap_exec', function (err) {
-                    $('body').children().last().remove();
-                    $('body').append('<p>Initializing Test...</p>');
+                socket.on('progress_zap_0_exec', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Initializing Test...</p>');
                 });
-                socket.on('progress_zap_test', function (err) {
-                    $('body').children().last().remove();
-                    $('body').append('<p>Performing Test... (THIS MAY TAKE A WHILE)</p>');
+                socket.on('progress_zap_1_spider', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Performing Test Part 1... (THIS MAY TAKE A WHILE)</p>');
                 });
-                socket.on('progress_file_write', function (err) {
-                    $('body').children().last().remove();
-                    $('body').append('<p>Writing New Report...</p>');
+                socket.on('progress_zap_2_active', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Performing Test Part 2...</p>');
                 });
-                socket.on('progress_file_done', function (err) {
-                    $('body').children().last().remove();
-                    $('body').append('<p>Checking Report Status...</p>');
+                socket.on('progress_zap_3_attack_done', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Finishing Test...</p>');
                 });
-                socket.on('progress_report_parse', function (err) {
-                    $('body').children().last().remove();
-                    $('body').append('<p>Getting Report Information...</p>');
+                socket.on('progress_zap_4_write_start', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Writing New Report...</p>');
                 });
-                socket.on('progress_report_done', function (err) {
-                    $('body').children().last().remove();
-                    $('body').append('<p>Finishing up...</p>');
+                socket.on('progress_zap_5_write_done', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Checking Report Status...</p>');
+                });
+                socket.on('progress_zap_6_parse_start', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Getting Report Information...</p>');
+                });
+                socket.on('progress_zap_6_parse_done', function (err) {
+                    $('#progress').children().last().remove();
+                    $('#progress').append('<p>Finishing up...</p>');
                 });
                 
                 
                 socket.on('error_zap_crash', function (err) {
                     alert('Error\nZap crashed.');
+                    $('#testButton').css('display', 'block');
+                    $('#cancelButton').css('display', 'none');
+                    $('#result').empty();
+                    $('#progress').empty();
                 });
                 socket.on('error_xmlparse_crash', function (err) {
                     alert('Error\nXML Parse crashed.');
+                    $('#testButton').css('display', 'block');
+                    $('#cancelButton').css('display', 'none');
+                    $('#result').empty();
+                    $('#progress').empty();
                 });
                 socket.on('error_invalid_url', function () {
                     alert('Error\nInvalid URL.');
+                    $('#testButton').css('display', 'block');
+                    $('#cancelButton').css('display', 'none');
+                    $('#result').empty();
+                    $('#progress').empty();
                 });
                 
+                /** 
+                 * BUTTON HANDLERS
+                 */
                 $('#testButton').click(function () {
-                    $('body').append('<img style="display:inline;" src="img/loading.gif" width="50"/>');
-                    $('body').append('<p>Loading...</p>');
+                    $('#testButton').css('display', 'none');
+                    $('#cancelButton').css('display', 'block');
+                    
+                    $('#result').empty();
+                    
+                    $('#progress').append('<img style="display:inline;float:left;" src="img/loading.gif" width="30"/>');
+                    $('#progress').append('<p>Loading...</p>');
+                    
                     socket.emit('test_request', {
                         url: $("#site").val()
                     });
+                });
+                $('#cancelButton').click(function () {
+                    $('#testButton').css('display', 'block');
+                    $('#cancelButton').css('display', 'none');
+                    
+                    $('#result').empty();
+                    $('#progress').empty();
+                    
+                    socket.emit('test_cancel');
                 });
             };
         </script>
@@ -108,9 +158,17 @@
 	<body>
 		<h2>Welcome to App Protect</h2>
         <hr>
-        <label>Type website: </label>
-        <input type="text" id="site" />
+        <h3>Type website: </h3>
+<!--        <input type="text" id="site" />-->
+        <input type="text" id="site" placeholder="Enter in your Website" />
         <br><br>
         <button id="testButton" class="green_button">Test Website</button>
+        <button id="cancelButton" class="green_button" style="display:none;">Cancel Test</button>
+        <div id='progress'>
+            
+        </div>
+        <div id='result'>
+            
+        </div>
 	</body>
 </html>

@@ -11,10 +11,10 @@ By David Song, Ryan Sickles, Glen Wise
 ## Server To-do List
 - @todo Check for minimum memory and queue up requests if necessary.
 
-- @todo ZAP can be run self-contained. Update Launch Command.
+- @todo ZAP can be run self-contained. Update Launch Command. (DONE)
 
 ## Front-end To-do List
-- @todo Create Cancel Button
+- @todo Create Cancel Button (DONE)
  
-- @todo Disable 'Test Website' once a test already initiated.
+- @todo Disable 'Test Website' once a test already initiated. (DONE)
 

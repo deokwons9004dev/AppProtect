@@ -49,26 +49,45 @@ exports.createReport = function (socket, url, callback) {
 	var output = path.normalize(__dirname + "/../data/reports/" + uuid.v4() + ".xml");
 
 	var port = exports.port;
+	socket.port = port;
 	exports.ports_used.push(port);
 	nextPort();
 
 	log('Port @ ' + port);
 
-	// /Applications/OWASP.app/Contents/Java/zap.sh -cmd -quickurl http://nodejs.love -quickout ~/test.xml -quickprogress
+	// zap.sh -cmd -quickurl http://nodejs.love -quickout ~/test.xml -quickprogress
 	/* OWASP ZAP Child Process Arguments. (Platform Dependent) */
-	var zap_path = "/Applications/OWASP.app/Contents/Java/zap.sh -port " + port;
+	var zap_path = __dirname + "/ZAP/zap.sh -cmd -quickprogress -port " + port;
 	var zap_option = "-quickurl " + url;
 	var zap_action = " -quickout " + output;
 	var cmd = zap_path + " " + zap_option + " " + zap_action;
 
 	/* Execute a new child process with the given args. */
-	var child = cp.exec(cmd, function (error, stdout, stderr) {
+	var child = cp.exec(cmd, function (error, stdout, stderr) {});
+	
+	socket.child = child;
+	socket.emit('progress_zap_0_exec');
+	
+	child.stdout.on('data', function (data) {
+		if (data.indexOf('Spidering') != -1)
+			socket.emit('progress_zap_1_spider');
+		if (data.indexOf('Active scanning') != -1)
+			socket.emit('progress_zap_2_active');
+		if (data.indexOf('Attack complete') != -1)
+			socket.emit('progress_zap_3_attack_done');
+//		log('STDOUT:' + data);
 	});
-	socket.emit('progress_zap_exec');
-
-	var timeout = setTimeout(function () {
-		socket.emit('progress_zap_test');
-	}, 5000);
+	child.stderr.on('data', function (data) {
+		socket.emit('error_zap_crash');
+		
+		clearInterval(timer);
+		
+		exports.ports_used.splice(exports.ports_used.indexOf(port), 1);
+		socket.port = null;
+		child.kill('SIGTERM');
+		
+//		log('STDERR:' + data);
+	});
 
 	/* Keep checking whether a report file has been written to the file system.
 	 * Once generated, SIGTERM the child process, clear the timer,
@@ -76,29 +95,22 @@ exports.createReport = function (socket, url, callback) {
 	 */
 	var timer = setInterval(function () {
 		if (exist(output)) {
+			
 			clearInterval(timer);
-			clearInterval(timeout);
-			socket.emit('progress_file_write');
+			socket.emit('progress_zap_4_write_start');
+			
 			checkReportDone(output, function () {
-				socket.emit('progress_file_done');
-				child.kill('SIGTERM');
+				socket.emit('progress_zap_5_write_done');
+				
 				exports.ports_used.splice(exports.ports_used.indexOf(port), 1);
+				socket.port = null;
+				child.kill('SIGTERM');
+				
 				return callback(undefined,output);
 			});
 		}
 	}, 1000);
 }
-
-/* CREATE_REPORT Example
-
-exports.createReport("http://nodejs.love", function (error, path) {
-	if (error)
-		log("Error:",error);
-	else
-		log('File @ ' + path);
-});
-
-*/
 
 function checkReportDone (filepath, callback) {
 	var fsize_prev = fs.statSync(filepath).size;
