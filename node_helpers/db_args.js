@@ -44,7 +44,13 @@ exports.processAppLogin = function (callback) {
 
 	/* Prompt function for Username */
 	var getUsername = function (cb) {
-		log('\nEnter MySQL Login Credentials (OR use -u and -p).');
+		log('\nApp Protect Server Login (Revision 2)');
+		log('Starting from this update, you must have a local MySQL account with admin privileges.');
+		log('Instructions on how to create a MySQL Admin Account can be found here:');
+		log('https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql\n');
+		log('To avoid the interactive prompt, you can also do:');
+		log('> node aprotect.js -u USER -p PASSWORD')
+		log('Enter your local MySQL Login Credentials.');
 		if (!pt.started) pt.start();
 		pt.message = "";
 		var schema = {
