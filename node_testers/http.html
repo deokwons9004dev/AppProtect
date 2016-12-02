@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script>
+			(function(open) {
+
+				XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+
+					this.addEventListener("readystatechange", function() {
+						console.log('ReadyState:',this.readyState);
+					}, false);
+
+					open.call(this, method, url, async, user, pass);
+				};
+
+			})(XMLHttpRequest.prototype.open);
+			
+			function sendPost(host,path,dict,callback) {
+				var data = new FormData();
+				data.append('data', JSON.stringify(dict));
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', host+path, true);
+				xhr.onload = function () {
+					return callback(JSON.parse(this.responseText));
+				};
+				xhr.onerror = function(error){
+					alert("Error with upload.\n" + error);
+				}
+				console.log(xhr);
+				xhr.send(data);
+			}
+			function sendFilePost(host,path,file,callback) {
+				var data = new FormData();
+				data.append('file', file);
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', host+path, true);
+				xhr.onload = function () {
+					return callback(JSON.parse(this.responseText));
+				};
+				xhr.onerror = function(error){
+					alert("Error with upload.\n" + error);
+				}
+				xhr.send(data);
+			}
+			function sendGet(host,path,callback) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', host+path, true);
+			// USE THIS IF THE BROWSER DOESN't SUPPORT IT.
+			//	xhr.onreadystatechange = function() {
+			//		if (this.readyState == 4 && this.status == 200)
+			//			callback(this.responseText);
+			//	};
+				xhr.onload = function () {
+					return callback(JSON.parse(this.responseText));
+				};
+				xhr.onerror = function(error){
+					alert("Error with upload.\n" + error);
+				};
+				xhr.send(null);
+			}
+			
+			function send() {
+				var id = document.getElementById('id');
+				var ps = document.getElementById('ps');
+				sendPost('http://localhost:8000', '/login', {id:id, ps:ps}, function () {
+					alert('YAY');
+				});
+			} 
+		</script>
+	</head>
+	<body>
+		<label>Id:</label>
+		<input id="id" type="text" />
+		<label>PS:</label>
+		<input id="ps" type="password" />
+		<button onclick="send()">submit</button>
+	</body>
+</html>

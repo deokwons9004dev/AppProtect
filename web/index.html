@@ -2,164 +2,48 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Web Security</title>
-        <style>
-            body {
-                font: 300 15px/1.5 "Helvetica Neue", helvetica, arial, sans-serif;
-                margin-left: 20px;
-                margin-right: 20px;
-            }
-            h3, h4, h5 {
-                margin-top: 0px;
-                margin-bottom: 0px;
-            }
-            .green_button {
-                background-color: #4CAF50;
-                border: none;
-                color: white;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-            }
-            input[type=text] {
-                width: 300px;
-                box-sizing: border-box;
-                border: 2px solid #ccc;
-                border-radius: 4px;
-                font-size: 16px;
-                background-color: white;
-                background-image: url('/img/searchicon.png');
-                background-position: 5px 5px;
-                background-repeat: no-repeat;
-                padding: 12px 20px 12px 40px;
-                -webkit-transition: width 0.4s ease-in-out;
-                transition: width 0.4s ease-in-out;
-            }
-            input[type=text]:focus {
-                width: 500px;
-            }
-        </style>
+		<title>App Protect Test</title>
+        <!-- Non-fancy StyleSheet for now. -->
+        <link rel="stylesheet" type="text/css" href="css/ap_beta1.css" />
+        <!-- Downloaded Scripts -->
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
+        <!-- Custom Script -->
         <script>
+            /* Read docs/socket_guide.pdf */
             var socket;
             window.onload = function () {
                 socket = io.connect(); 
                 
-                socket.on('test_result', function (data) {
-                    $('#testButton').css('display', 'block');
-                    $('#cancelButton').css('display', 'none');
-                    $('#progress').empty();
-                    data.forEach(function (item, i) {
-                        var output = '';
-                        output += '<h3>' + item.alert + '</h3>';
-                        output += '<h5>Risk Level: ' + item.risklevel + '</h5>';
-                        output += '<h5>Risk Description: ' + item.risktext + '</h5>';
-                        output += '<h5>Description: ' + jQuery(item.description).text() + '</h5>';
-                        item.instances.forEach(function (url, j) {
-                            output += '<h5>Instance: ' + url + '</h5>';
-                        });
-                        output += '<h5>Instance Count: ' + item.count + '</h5>';
-                        output += '<h5>solution: ' + jQuery(item.solution).text() + '</h5>';
-                        output += '<h5>Info: ' + jQuery(item.info).text() + '</h5>';
-                        output += '<h5>Ref: ' + jQuery(item.ref).text() + '</h5>';
-                        $('#result').append(output);
-                    });
+                $.getScript('js/ap_zap.js', function () {
+                    console.log('App Protect ZAP Quick Test Feature Loaded.'); 
                 });
-                
-                socket.on('progress_zap_0_exec', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Initializing Test...</p>');
+                $.getScript('js/ap_login.js', function () {
+                    console.log('App Protect Login Feature Loaded.'); 
                 });
-                socket.on('progress_zap_1_spider', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Performing Test Part 1... (THIS MAY TAKE A WHILE)</p>');
-                });
-                socket.on('progress_zap_2_active', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Performing Test Part 2...</p>');
-                });
-                socket.on('progress_zap_3_attack_done', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Finishing Test...</p>');
-                });
-                socket.on('progress_zap_4_write_start', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Writing New Report...</p>');
-                });
-                socket.on('progress_zap_5_write_done', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Checking Report Status...</p>');
-                });
-                socket.on('progress_zap_6_parse_start', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Getting Report Information...</p>');
-                });
-                socket.on('progress_zap_6_parse_done', function (err) {
-                    $('#progress').children().last().remove();
-                    $('#progress').append('<p>Finishing up...</p>');
-                });
-                
-                
-                socket.on('error_zap_crash', function (err) {
-                    alert('Error\nZap crashed.');
-                    $('#testButton').css('display', 'block');
-                    $('#cancelButton').css('display', 'none');
-                    $('#result').empty();
-                    $('#progress').empty();
-                });
-                socket.on('error_xmlparse_crash', function (err) {
-                    alert('Error\nXML Parse crashed.');
-                    $('#testButton').css('display', 'block');
-                    $('#cancelButton').css('display', 'none');
-                    $('#result').empty();
-                    $('#progress').empty();
-                });
-                socket.on('error_invalid_url', function () {
-                    alert('Error\nInvalid URL.');
-                    $('#testButton').css('display', 'block');
-                    $('#cancelButton').css('display', 'none');
-                    $('#result').empty();
-                    $('#progress').empty();
-                });
-                
-                /** 
-                 * BUTTON HANDLERS
-                 */
-                $('#testButton').click(function () {
-                    $('#testButton').css('display', 'none');
-                    $('#cancelButton').css('display', 'block');
-                    
-                    $('#result').empty();
-                    
-                    $('#progress').append('<img style="display:inline;float:left;" src="img/loading.gif" width="30"/>');
-                    $('#progress').append('<p>Loading...</p>');
-                    
-                    socket.emit('test_request', {
-                        url: $("#site").val()
-                    });
-                });
-                $('#cancelButton').click(function () {
-                    $('#testButton').css('display', 'block');
-                    $('#cancelButton').css('display', 'none');
-                    
-                    $('#result').empty();
-                    $('#progress').empty();
-                    
-                    socket.emit('test_cancel');
+                $.getScript('js/ap_register.js', function () {
+                    console.log('App Protect Registration Feature Loaded.'); 
                 });
             };
         </script>
 	</head>
 	<body>
 		<h2>Welcome to App Protect</h2>
+        
+        <hr>
+        <h3>Login Test</h3>
+        <input type="text"     id="id_login" placeholder="User ID" />
+        <input type="password" id="ps_login" placeholder="User Password" />
+        <button id="loginButton" class="green_button">Test Login</button>
+        
+        <hr>
+        <h3>Registration Test</h3>
+        <input type="text"     id="id_reg" placeholder="New User ID" />
+        <input type="password" id="ps_reg" placeholder="New User Password" />
+        <button id="regButton" class="green_button">Test Registration</button>
+        
         <hr>
         <h3>Type website: </h3>
-<!--        <input type="text" id="site" />-->
         <input type="text" id="site" placeholder="Enter in your Website" />
         <br><br>
         <button id="testButton" class="green_button">Test Website</button>

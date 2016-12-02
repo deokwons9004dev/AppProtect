@@ -1,0 +1,38 @@
+body {
+	font: 300 15px/1.5 "Helvetica Neue", helvetica, arial, sans-serif;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+h3, h4, h5 {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.green_button {
+	background-color: #4CAF50;
+	border: none;
+	color: white;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	cursor: pointer;
+}
+input {
+	width: 300px;
+	box-sizing: border-box;
+	border: 2px solid #ccc;
+	border-radius: 4px;
+	font-size: 16px;
+	background-color: white;
+	background-image: url('/img/searchicon.png');
+	background-position: 5px 5px;
+	background-repeat: no-repeat;
+	padding: 12px 20px 12px 40px;
+	-webkit-transition: width 0.4s ease-in-out;
+	transition: width 0.4s ease-in-out;
+}
+input[type=text]:focus {
+	width: 500px;
+}

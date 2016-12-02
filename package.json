@@ -6,12 +6,23 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "express": "3.x",
-    "zaproxy": "*",
-    "socket.io": "*",
-    "xmljson": "*",
-    "validator": "*",
-    "file-exists": "*",
-    "node-uuid": "*"
+    "zaproxy"      : "*",
+    "xmljson"      : "*",
+    "stream-http"  : "*",
+    
+    "express"      : "3.x",
+    "socket.io"    : "*",
+    "xml2js"       : "*",
+    "validator"    : "*",
+    "file-exists"  : "*",
+    "node-uuid"    : "*",
+    "async"        : "*",
+    "bcrypt-nodejs": "*",
+    "node-uuid"    : "*",
+    "mysql"        : "*",
+    "prompt"       : "*",
+    "colors"       : "*",
+    "request"      : "*"
+   
   }
 }
