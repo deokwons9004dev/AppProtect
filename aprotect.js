@@ -77,11 +77,13 @@ var server = http.createServer(app).listen(5001, function () {
 
 /* Import Express Middle-wares. */
 app.use(express.favicon(path.join(__dirname, 'web', 'img','favicon.ico')));
-//app.use(express.logger('dev'));
-app.use(express.bodyParser());
+app.use(express.json());
+app.use(express.urlencoded());
 app.use(express.cookieParser());
 app.use(express.static(path.join(__dirname, 'web')));
+//app.use(express.bodyParser()); <-- Bring this back if forms isn't working.
 //app.use(express.cookieSession());
+//app.use(express.logger('dev'));
 
 /* GET Requests */
 app.get('/', function (req,res,next) {
