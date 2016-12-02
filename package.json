@@ -22,7 +22,8 @@
     "mysql"        : "*",
     "prompt"       : "*",
     "colors"       : "*",
-    "request"      : "*"
+    "request"      : "*",
+    "fs.extra"     : "*"
    
   }
 }

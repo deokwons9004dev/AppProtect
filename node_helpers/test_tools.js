@@ -129,6 +129,8 @@ exports.cancelzap = function (socket) {
 		socket.child.kill('SIGTERM');
 		socket.port = null;
 		socket.child = null;
+		clearInterval(socket.timer_zap);
+		clearInterval(socket.timer_zap_file);
 		
 		log(colors.green('Server (Info): ZAP test cancelled.'));
 		

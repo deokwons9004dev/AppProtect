@@ -28,6 +28,7 @@ var log  = console.log.bind(this);
 var exist  = require("file-exists");
 var uuid   = require("node-uuid");
 var colors = require("colors");
+var fsx    = require("fs.extra");
 
 /* Static Module variables. */
 const minPort = 7000;    // Lowest port number available to sockets. 
@@ -72,20 +73,20 @@ function nextPort () {
  * @param none.
  * @return none.
  */
-function checkReportDone (filepath, callback) {
+function checkReportDone (socket, filepath, callback) {
 	var fsize_prev   = fs.statSync(filepath).size;
 	var fsize        = fsize_prev;
 	
 	const count_done = 4;
 	var count        = 0;
 	
-	var timer_fsize = 
+	socket.timer_zap_file = 
 	setInterval(function () {
 		fsize = fs.statSync(filepath).size;
 		if (fsize == fsize_prev) {
 			count++;
 			if (count == count_done) {
-				clearInterval(timer_fsize);
+				clearInterval(socket.timer_zap_file);
 				return callback();
 			}
 		}
@@ -107,7 +108,10 @@ function checkReportDone (filepath, callback) {
 exports.createReport = function (socket, url, callback) {
 	
 	/* The report output path name is randomly generated. */
-	var output = path.normalize(__dirname + "/../user_data/reports/" + uuid.v4() + ".xml");
+	var output_dir = path.normalize(__dirname + "/../user_data/reports");
+	var output = path.normalize(output_dir + "/" + uuid.v4() + ".xml");
+	
+	fsx.mkdirpSync(output_dir);
 	
 	/* Obtains a free port and adds it to the array of busy ports. */
 	var port    = exports.port;
@@ -127,7 +131,7 @@ exports.createReport = function (socket, url, callback) {
 	/* Execute a new child process with the given args. */
 	var child = cp.exec(cmd, function (error, stdout, stderr) {});
 	
-	log(colors.cyan('Server (Info): Zap Child Process Spawned at port %d', port));
+	log(colors.cyan('Server (Info): Zap Child Process Spawned at port', port));
 		
 	/* Assign the child object to the sockets attribute. */
 	socket.child = child;
@@ -152,7 +156,8 @@ exports.createReport = function (socket, url, callback) {
 	 * 5) Return callback with erro string.
 	 */
 	child.stderr.on('data', function (data) {
-		clearInterval(timer);
+		clearInterval(socket.timer_zap);
+		clearInterval(socket.timer_zap_file);
 		exports.ports_used.splice(exports.ports_used.indexOf(port), 1);
 		socket.port = null;
 		child.kill('SIGTERM');
@@ -163,13 +168,13 @@ exports.createReport = function (socket, url, callback) {
 	 * Once generated, SIGTERM the child process, clear the timer,
 	 * and return a callback with the report file path.
 	 */
-	var timer = setInterval(function () {
+	socket.timer_zap = setInterval(function () {
 		if (exist(output)) {
 			
-			clearInterval(timer);
+			clearInterval(socket.timer_zap);
 			socket.emit('progress_zap_4_write_start');
 			
-			checkReportDone(output, function () {
+			checkReportDone(socket, output, function () {
 				socket.emit('progress_zap_5_write_done');
 				
 				exports.ports_used.splice(exports.ports_used.indexOf(port), 1);
