@@ -7,6 +7,8 @@
         <link rel="stylesheet" type="text/css" href="css/ap_beta1.css" />
         <!-- Downloaded Scripts -->
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="/js/mod_is.js"></script>
+        <script src="/js/mod_filesaver_text.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <!-- Custom Script -->
         <script>
@@ -23,6 +25,9 @@
                 });
                 $.getScript('js/ap_register.js', function () {
                     console.log('App Protect Registration Feature Loaded.'); 
+                });
+                $.getScript('js/ap_verify.js', function () {
+                    console.log('App Protect Site Verification Feature Loaded.'); 
                 });
             };
         </script>
@@ -41,6 +46,30 @@
         <input type="text"     id="id_reg" placeholder="New User ID" />
         <input type="password" id="ps_reg" placeholder="New User Password" />
         <button id="regButton" class="green_button">Test Registration</button>
+        
+        <hr>
+        <h3>Site Verification Test (Login REQUIRED)</h3>
+        <p>Use this feature after you go through the login test or else it won't work.</p>
+        <p>Get yout token file first, and copy that file to the webroot of your website.</p>
+        <p>and then click 'verify site' to check whether your site was successfully verified.</p>
+        <button id="tokenButton" class="green_button" style="display: none;">Get Token File</button>
+        <table id="vsiteTable" width="100%" border="1" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Verified Domain</th>
+                    <th>DELETE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr> 
+                    <td>www.nodejs.love</td>
+                    <td style="text-align: center;"><a href="#" onclick="removeSite('nodejs.love')">REMOVE</a></td>
+                </tr>    
+            </tbody>
+        </table>
+        <br>
+        <input type="text" id="ver_site" placeholder="User Website" style="display: none;"/>
+        <button id="verifyButton" class="green_button" style="display: none;">Verify Site</button>
         
         <hr>
         <h3>Type website: </h3>

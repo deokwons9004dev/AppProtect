@@ -95,17 +95,18 @@ app.get('/', function (req,res,next) {
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
-    next(err);
+    res.send(err);
+//    next(err);
 });
 // error handler
-app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
-});
+//app.use(function(err, req, res, next) {
+//    // set locals, only providing error in development
+//    res.locals.message = err.message;
+//    res.locals.error = req.app.get('env') === 'development' ? err : {};
+//    // render the error page
+//    res.status(err.status || 500);
+//    res.render('error');
+//});
 
 
 /* Initialize Socket.io */
@@ -124,11 +125,17 @@ io.sockets.on("connection", function (socket) {
     });
     
     /* User Web Server Verification */
-    socket.on('verify_token', function (form) {
-        usertools.verifyToken(client, socket);
+    socket.on('verify_token', function () {
+        usertools.verifyToken(socket);
+    });
+    socket.on('get_verified_sites', function () {
+        usertools.getVerifiedSites(client, socket);
+    });
+    socket.on('remove_verified_site', function (site) {
+        usertools.removeVerifiedSite(client, socket, site);
     });
     socket.on('verify_request', function (form) {
-        usertools.verifySite(client, socket, form);
+        usertools.verifyRequest(client, socket, form);
     });
 
     /* Pen Test Features */
