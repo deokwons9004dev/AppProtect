@@ -45,7 +45,7 @@ input {
 }
 
 #search_tab{
-	 margin: 15% 0 0 5%;
+	 margin: 5% 0 0 5%;
 }
 
 #logo{
@@ -66,12 +66,12 @@ input {
 }
 
 #vulnerability_table{
-	margin-top: 5%;
+	margin-top: 10%;
 	padding-right: 50px;
 	padding-left: 75px;
 }
 #verified_sites{
-	margin-top: 5%;
+	margin-top: 10%;
 	padding-right: 100px;
 }
 
