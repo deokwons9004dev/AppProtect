@@ -6,13 +6,11 @@ socket.on('login_reject', function (error) {
 });
 socket.on('login_success', function (user) {
 	alert('Login Success.\nUser:' + user);
-	$('#tokenButton').css('display', 'block');
-	$('#ver_site').css('display', 'block');
-	$('#verifyButton').css('display', 'block');
-	getVerifiedSites();
+//	$('#tokenButton').css('display', 'block');
+//	$('#ver_site').css('display', 'block');
+//	$('#verifyButton').css('display', 'block');
+//	getVerifiedSites();
 });
-
-/* Button Handlers */
 $('#agree_terms_button').click(function () {
 	socket.emit('login', {
 		id: $('#username').val(),

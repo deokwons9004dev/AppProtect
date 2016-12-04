@@ -14,6 +14,7 @@
     "http-proxy"   : "*",
     "request-debug": "*",
     "jsdom"        : "*",
+    "http-proxy-middleware": "*",
     
     "express"      : "3.x",
     "socket.io"    : "*",
