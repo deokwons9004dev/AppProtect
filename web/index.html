@@ -62,9 +62,7 @@
         <input type="text"     id="id_reg" placeholder="New User ID" />
         <input type="password" id="ps_reg" placeholder="New User Password" />
         <button id="regButton" class="green_button">Test Registration</button>
-
-
-        <button id="tokenButton" class="green_button" style="display: none;">Get Token File</button> -->
+        -->
         <table id="vsiteTable" width="100%" border="1" style="display: none;">
             <thead>
                 <tr>
@@ -82,7 +80,7 @@
         <br>
         <input type="text" id="ver_site" placeholder="User Website" style="display:none;"/>
         <div class="row" id="search_tab">
-            <div class="input-field col s6" id="search_block">
+            <div class="input-field col s7" id="search_block">
                 <input placeholder="Wesbite URL" id="site" type="text">
             </div>
             <div id="testing_inputs" style="display:none;">
@@ -107,6 +105,50 @@
         </button>
          </div>
 
+        </div>
+        <div class="row">
+             <div class="col s6" id="vulnerability_table">
+                <center> Most Common Vulnerabilities Across All User Web Sites </center>
+             <table class="highlight">
+                <thead>
+                  <tr>
+                      <th data-field="id">Rank</th>
+                      <th data-field="vulnerability">Vulnerability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                </tr>
+                </tbody>
+             </table>
+            </div>
+            <div class="col s6" id="verified_sites">
+                <center> Your Verified Websites </center>
+             <table class="highlight">
+                <thead>
+                  <tr>
+                      <th data-field="website">Website</th>
+                      <th data-field="last_tested">Last Tested</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+             </table>
+            </div>
         </div>
         <button id="cancelButton" class="green_button" style="display:none;">Cancel Test</button>
         <div id='progress'></div>

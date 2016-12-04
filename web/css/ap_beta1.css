@@ -35,9 +35,6 @@ input {
 	-webkit-transition: width 0.4s ease-in-out;
 	transition: width 0.4s ease-in-out;
 }
-input[type=text]:focus {
-	width: 500px;
-}
 
 #select_boxes {
 	padding-top: 15px;
@@ -48,7 +45,7 @@ input[type=text]:focus {
 }
 
 #search_tab{
-	 margin: 15% 0 0 12%;
+	 margin: 15% 0 0 5%;
 }
 
 #logo{
@@ -62,4 +59,18 @@ input[type=text]:focus {
 #auth_token{
 	margin-top: 10%;
 	margin-left: 4%;
+}
+
+#testing_inputs{
+	margin: 15% 0 0 5%;
+}
+
+#vulnerability_table{
+	margin-top: 10%;
+	padding-right: 50px;
+	padding-left: 75px;
+}
+#verified_sites{
+	margin-top: 10%;
+	padding-right: 100px;
 }
