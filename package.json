@@ -9,6 +9,11 @@
     "zaproxy"      : "*",
     "xmljson"      : "*",
     "stream-http"  : "*",
+    "http-raw"     : "*",
+    "through"      : "*",
+    "http-proxy"   : "*",
+    "request-debug": "*",
+    "jsdom"        : "*",
     
     "express"      : "3.x",
     "socket.io"    : "*",

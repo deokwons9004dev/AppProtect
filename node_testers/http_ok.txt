@@ -1,0 +1,13 @@
+POST http://crackme.cenzic.com/kelev/php/login.php HTTP/1.1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:50.0) Gecko/20100101 Firefox/50.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Referer: http://crackme.cenzic.com/kelev/php/login.php
+Cookie: PHPSESSID=etfnrm40qlkfa4jkogmnbeu760
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 145
+Host: crackme.cenzic.com
+
+hLoginType=&hPageName=accttransaction.php&whoislog=Welcome+to+CrackMeBank+Investments&hUserId=0&LoginName=*&Password=*&sendbutton1=Login
