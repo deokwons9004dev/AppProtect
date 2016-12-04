@@ -83,3 +83,22 @@ input {
 #disagree_terms_button{
 		color: white;
 }
+
+#progress{
+	margin-top: 5%;
+  margin-left: 45%;
+}
+
+#result {
+	overflow:auto;
+}
+
+#cancelButton{
+	margin-top: 5%;
+  margin-left: 40%;
+}
+
+#site_name{
+	margin-top: 5%;
+  margin-left: 40%;
+}

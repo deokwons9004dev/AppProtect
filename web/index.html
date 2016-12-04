@@ -95,14 +95,14 @@
         <input type="text" id="ver_site" placeholder="User Website" style="display:none;"/>
         <div class="row" id="search_tab">
             <div class="input-field col s7" id="search_block">
-                <input placeholder="Wesbite URL" id="site" type="text">
+                <input placeholder="Wesbite URL" id="search_text" type="text">
             </div>
             <div id="testing_inputs" style="display:none;">
                 <div class="input-field col s3" id="search_block">
-                    <input placeholder="Username" id="site" type="text">
+                    <input placeholder="Username" id="username" type="text">
                 </div>
                 <div class="input-field col s3" id="search_block">
-                    <input placeholder="Password" id="site" type="text">
+                    <input placeholder="Password" id="password" type="text">
                 </div>
             </div>
             <div class="col s2" id="select_boxes">
@@ -120,7 +120,7 @@
          </div>
 
         </div>
-        <div class="row">
+        <div id="tableview" class="row">
              <div class="col s6" id="vulnerability_table">
                 <center> Most Common Vulnerabilities Across All User Web Sites </center>
              <table class="highlight">
@@ -164,11 +164,26 @@
              </table>
             </div>
         </div>
-        <!-- <button id="cancelButton" class="green_button" style="display:none;">Cancel Test</button>
-        <div id='progress'></div>
-        <div id='result'>
+        <div class="row">
+        <div id="site_name"></div>
+        <div id='progress' style="display:none;">
+            <div class="preloader-wrapper big active">
+                <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                <div class="circle"></div>
+                </div><div class="gap-patch">
+                <div class="circle"></div>
+                </div><div class="circle-clipper right">
+                <div class="circle"></div>
+                </div>
+                </div>
+            </div>
+        </div>
+            <button id="cancelButton" class="btn waves-effect waves-light red" type="submit" name="action" style="display:none;">Cancel Test</button>
+            <div id='result'>
 
-        </div> -->
+            </div>
+        </div>
                 <!-- Page Content goes here -->
         </div>
 	</body>
