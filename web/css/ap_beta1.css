@@ -66,11 +66,20 @@ input {
 }
 
 #vulnerability_table{
-	margin-top: 10%;
+	margin-top: 5%;
 	padding-right: 50px;
 	padding-left: 75px;
 }
 #verified_sites{
-	margin-top: 10%;
+	margin-top: 5%;
 	padding-right: 100px;
+}
+
+#agree_terms_button{
+	margin-left: 15px;
+	color: white;
+}
+
+#disagree_terms_button{
+		color: white;
 }

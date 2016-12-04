@@ -49,6 +49,7 @@
                 <li><a href="About_Us.html">About</a></li>
                 <li><a href="faq.html">FAQ's</a></li>
                 <li><a href="get_auth_token.html">Get Authentication Token</a></li>
+                <li><a href="logout.html">Logout</a></li>
               </ul>
             </div>
             </nav>
@@ -77,6 +78,19 @@
                 </tr>
             </tbody>
         </table>
+
+        <div id="legal_modal" class="modal">
+            <div class="modal-content">
+            <h4>Legal Terms And Conditions</h4>
+            <p>You must abide by the following to use our software</p>
+            </div>
+            <div class="modal-footer">
+            <a href="#!" id="agree_terms_button" class=" modal-action modal-close waves-effect waves-green btn-flat green">Agree</a>
+            <a href="#!" id="disagree_terms_button" class=" modal-action modal-close waves-effect waves-green btn-flat red">Disagree</a>
+            </div>
+        </div>
+
+
         <br>
         <input type="text" id="ver_site" placeholder="User Website" style="display:none;"/>
         <div class="row" id="search_tab">
@@ -100,7 +114,7 @@
         </select>
             </div>
         <div class="col s2" id="test_button">
-        <button class="btn waves-effect waves-light blue lighten-3" type="submit" name="action">Test
+        <button data-target="legal_modal" class="btn waves-effect waves-light blue lighten-3" type="submit" name="action">Test
             <i class="material-icons right">call_made</i>
         </button>
          </div>
@@ -150,11 +164,11 @@
              </table>
             </div>
         </div>
-        <button id="cancelButton" class="green_button" style="display:none;">Cancel Test</button>
+        <!-- <button id="cancelButton" class="green_button" style="display:none;">Cancel Test</button>
         <div id='progress'></div>
         <div id='result'>
 
-        </div>
+        </div> -->
                 <!-- Page Content goes here -->
         </div>
 	</body>
