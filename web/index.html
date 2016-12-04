@@ -10,49 +10,64 @@
         <script src="/js/mod_is.js"></script>
         <script src="/js/mod_filesaver_text.js"></script>
         <script src="/socket.io/socket.io.js"></script>
+        <!-- Compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <!-- Custom Script -->
         <script>
             /* Read docs/socket_guide.pdf */
             var socket;
             window.onload = function () {
-                socket = io.connect(); 
-                
+                socket = io.connect();
+
                 $.getScript('js/ap_zap.js', function () {
-                    console.log('App Protect ZAP Quick Test Feature Loaded.'); 
+                    console.log('App Protect ZAP Quick Test Feature Loaded.');
                 });
                 $.getScript('js/ap_login.js', function () {
-                    console.log('App Protect Login Feature Loaded.'); 
+                    console.log('App Protect Login Feature Loaded.');
                 });
                 $.getScript('js/ap_register.js', function () {
-                    console.log('App Protect Registration Feature Loaded.'); 
+                    console.log('App Protect Registration Feature Loaded.');
                 });
                 $.getScript('js/ap_verify.js', function () {
-                    console.log('App Protect Site Verification Feature Loaded.'); 
+                    console.log('App Protect Site Verification Feature Loaded.');
+                });
+                $.getScript('js/main.js', function () {
+                    console.log('Main Features Loaded');
                 });
             };
         </script>
 	</head>
 	<body>
-		<h2>Welcome to App Protect</h2>
-        
-        <hr>
-        <h3>Login Test</h3>
+        <div class="container">
+            <nav>
+            <div class="nav-wrapper red">
+              <a href="#" class="brand-logo">AppProtect</a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="About_Us.html">About Us</a></li>
+              </ul>
+            </div>
+            </nav>
+        <!-- <h3>Login Test</h3>
         <input type="text"     id="id_login" placeholder="User ID" />
         <input type="password" id="ps_login" placeholder="User Password" />
         <button id="loginButton" class="green_button">Test Login</button>
-        
+
         <hr>
         <h3>Registration Test</h3>
         <input type="text"     id="id_reg" placeholder="New User ID" />
         <input type="password" id="ps_reg" placeholder="New User Password" />
         <button id="regButton" class="green_button">Test Registration</button>
-        
+
         <hr>
         <h3>Site Verification Test (Login REQUIRED)</h3>
         <p>Use this feature after you go through the login test or else it won't work.</p>
         <p>Get yout token file first, and copy that file to the webroot of your website.</p>
         <p>and then click 'verify site' to check whether your site was successfully verified.</p>
-        <button id="tokenButton" class="green_button" style="display: none;">Get Token File</button>
+        <button id="tokenButton" class="green_button" style="display: none;">Get Token File</button> -->
         <table id="vsiteTable" width="100%" border="1" style="display: none;">
             <thead>
                 <tr>
@@ -61,27 +76,42 @@
                 </tr>
             </thead>
             <tbody>
-                <tr> 
+                <tr>
                     <td>www.nodejs.love</td>
                     <td style="text-align: center;"><a href="#" onclick="removeSite('nodejs.love')">REMOVE</a></td>
-                </tr>    
+                </tr>
             </tbody>
         </table>
         <br>
         <input type="text" id="ver_site" placeholder="User Website" style="display: none;"/>
-        <button id="verifyButton" class="green_button" style="display: none;">Verify Site</button>
-        
-        <hr>
-        <h3>Type website: </h3>
-        <input type="text" id="site" placeholder="Enter in your Website" />
-        <br><br>
-        <button id="testButton" class="green_button">Test Website</button>
-        <button id="cancelButton" class="green_button" style="display:none;">Cancel Test</button>
-        <div id='progress'>
-            
+        <div class="row">
+            <div class="input-field col s6">
+                <input placeholder="Enter input" id="site" type="text">
+            </div>
+            <div class="col s2" id="select_boxes">
+          <select id="type_test">
+          <option value="" disabled selected>Select Test</option>
+          <option value="1">Website</option>
+          <option value="2">Registration</option>
+          <option value="3">Login</option>
+        </select>
+            </div>
+        <div class="col s2" id="test_button">
+        <button class="btn waves-effect waves-light" type="submit" name="action">Test
+            <i class="material-icons right">call_made</i>
+        </button>
+         </div>
+        <!-- Dropdown Trigger -->
+      <!--   <a class='dropdown-button btn red' id="search_dropdown" color="blue" data-activates='dropdown1'><span id="text">Website</span><i class="material-icons right">arrow_drop_down</i></a> -->
+        <!-- Dropdown Structure -->
+
         </div>
+        <button id="cancelButton" class="green_button" style="display:none;">Cancel Test</button>
+        <div id='progress'></div>
         <div id='result'>
-            
+
+        </div>
+                <!-- Page Content goes here -->
         </div>
 	</body>
 </html>
