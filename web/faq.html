@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<title>FAQ's</title>
+		 <!-- Compiled and minified CSS -->
+        <meta charset="UTF-8">
+
+        <!-- Non-fancy StyleSheet for now. -->
+        <link rel="stylesheet" type="text/css" href="css/ap_beta1.css" />
+        <!-- Downloaded Scripts -->
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="/js/mod_is.js"></script>
+        <script src="/js/mod_filesaver_text.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <!-- Compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<script>
+            /* Read docs/socket_guide.pdf */
+            var socket;
+            window.onload = function () {
+                socket = io.connect();
+                $.getScript('js/ap_zap.js', function () {
+                    console.log('App Protect ZAP Quick Test Feature Loaded.');
+                });
+                $.getScript('js/ap_login.js', function () {
+                    console.log('App Protect Login Feature Loaded.');
+                });
+                $.getScript('js/ap_register.js', function () {
+                    console.log('App Protect Registration Feature Loaded.');
+                });
+                $.getScript('js/ap_verify.js', function () {
+                    console.log('App Protect Site Verification Feature Loaded.');
+                });
+                $.getScript('js/main.js', function () {
+                    console.log('Main Features Loaded');
+                });
+            };
+        </script>
+	</head>
+	 <div class="container">
+	 	<nav>
+            <div class="nav-wrapper blue lighten-3">
+              <a href="index.html" class="brand-logo" id="logo">AppProtect</a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="About_Us.html">About</a></li>
+                <li><a href="faq.html">FAQ's</a></li>
+                <li><a href="get_auth_token.html">Get Authentication Token</a></li>
+              </ul>
+            </div>
+
+     <div class="row" id="faq_text">
+     	<h3>What is Site Testing For?</h3>
+        <h5>Site Verification Test (Login REQUIRED)</h5>
+        <p>Use this feature after you go through the login test or else it won't work.
+        Get yout token file first, and copy that file to the webroot of your website.
+        and then click 'verify site' to check whether your site was successfully verified.</p>
+        <hr>
+   	 </div>
+    </nav>
+	 </div>
+</html>

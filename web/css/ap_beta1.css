@@ -46,3 +46,20 @@ input[type=text]:focus {
 #test_button{
 	padding-top: 25px;
 }
+
+#search_tab{
+	 margin: 15% 0 0 12%;
+}
+
+#logo{
+	margin-left: 10px;
+}
+
+#faq_text{
+	color:#000000;
+}
+
+#auth_token{
+	margin-top: 10%;
+	margin-left: 4%;
+}
