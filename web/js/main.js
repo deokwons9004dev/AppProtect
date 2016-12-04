@@ -1,4 +1,15 @@
 $(document).ready(function() {
+
+
+	//check if user is logged in
+
+	if (typeof $.cookie('user') === 'undefined'){
+		//no cookie
+	} else {
+		//have cookie
+	}
+
+
     $('select').material_select();
 
     $('#cancelButton').click(function () {
@@ -40,7 +51,7 @@ $(document).ready(function() {
     		$('#search_block').css({"line-height": "","border": "","border-radius": ""});
     		$('#cancelButton').show();
     		$('#search_text').val("");
-    		$('#site_name').text("Testing " + website_url + "...");
+    		$('#site_name').text("Testing 	" + website_url + "...");
     		//make call to backend
     	}
     	if( (search_two_input && username && password && test_type)){
@@ -64,12 +75,26 @@ $(document).ready(function() {
     		}
 
     		if(!website_url && search_one_input){
+    			console.log("one input");
     			$('#search_block').css({"line-height": "1","border": "solid 4px #ff0000","border-radius": "10px"});
+    		}else{
+    			if(search_one_input){
+    				$('#search_block').css({"line-height": "","border": "","border-radius": ""});
+    			}
     		}
-    		if((!password || !username) && search_two_input){
-    				$('#search_block').css({"line-height": "1","border": "solid 4px #ff0000","border-radius": "10px"});
+    		if((!password) && search_two_input){
+    				$('#pass').css({"line-height": "1","border": "solid 4px #ff0000","border-radius": "10px"});
     		} else {
-    			 	$('#search_block').css({"line-height": "","border": "","border-radius": ""});
+    			if(search_two_input){
+    			 	$('#pass').css({"line-height": "","border": "","border-radius": ""});
+    			 }
+    		}
+    		if((!username) && search_two_input){
+    				$('#user').css({"line-height": "1","border": "solid 4px #ff0000","border-radius": "10px"});
+    		} else {
+    			if(search_two_input){
+    			 	$('#user').css({"line-height": "","border": "","border-radius": ""});
+    			 }
     		}
 
 
