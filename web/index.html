@@ -47,38 +47,15 @@
               <a href="index.html" class="brand-logo" id="logo">AppProtect</a>
               <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="About_Us.html">About</a></li>
-                <li><a href="faq.html">FAQ's</a></li>
-                <li><a href="get_auth_token.html">Get Authentication Token</a></li>
-                <li><a href="logout.html">Logout</a></li>
+                <div class="logged_in">
+                    <li><a href="faq.html">FAQ's</a></li>
+                    <li><a id="tokenButton">Get Authentication Token</a></li>
+                    <li><a href="logout.html">Logout</a></li>
+                </div>
               </ul>
             </div>
             </nav>
-        <!-- <h3>Login Test</h3>
-        <input type="text"     id="id_login" placeholder="User ID" />
-        <input type="password" id="ps_login" placeholder="User Password" />
-        <button id="loginButton" class="green_button">Test Login</button>
-
-        <hr>
-        <h3>Registration Test</h3>
-        <input type="text"     id="id_reg" placeholder="New User ID" />
-        <input type="password" id="ps_reg" placeholder="New User Password" />
-        <button id="regButton" class="green_button">Test Registration</button>
-        -->
-        <div id="logged_in">
-        <table id="vsiteTable" width="100%" border="1" style="display: none;">
-            <thead>
-                <tr>
-                    <th>Verified Domain</th>
-                    <th>DELETE</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>www.nodejs.love</td>
-                    <td style="text-align: center;"><a href="#" onclick="removeSite('nodejs.love')">REMOVE</a></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="logged_in">
 
         <div id="legal_modal" class="modal">
             <div class="modal-content">
@@ -96,7 +73,7 @@
         <input type="text" id="ver_site" placeholder="User Website" style="display:none;"/>
         <div class="row" id="search_tab">
             <div class="input-field col s7" id="search_block">
-                <input placeholder="Wesbite URL" id="search_text" type="text">
+                <input placeholder="Website URL" id="search_text" type="text">
             </div>
             <div id="testing_inputs" style="display:none;">
                 <div class="input-field col s3" id="user">
@@ -108,11 +85,10 @@
             </div>
             <div class="col s2" id="select_boxes">
           <select id="type_test">
-          <option value="" disabled selected>Select Test</option>
-          <option value="1">Website</option>
-          <option value="2">Registration</option>
-          <option value="3">Login</option>
-        </select>
+              <option value="" disabled selected>Select Test</option>
+              <option value="1">ZAP</option>
+              <option value="2">SQL MAP</option>
+          </select>
             </div>
         <div class="col s2" id="test_button">
         <button data-target="legal_modal" class="btn waves-effect waves-light blue lighten-3" type="submit" name="action">Test
@@ -120,6 +96,40 @@
         </button>
          </div>
 
+        </div>
+
+        <!-- end of logged in content -->
+        </div>
+
+        <div id="log_in_forms">
+            <div class="row">
+                <div class="col s1 registration_form">
+                    Register:
+                </div>
+                <div class="input-field col s3" id="user">
+                    <input placeholder="New Username" id="id_reg" type="text">
+                </div>
+                <div class="input-field col s3" id="user">
+                    <input placeholder="New Password" id="ps_reg" type="password">
+                </div>
+                <div class="col s1 registration_form">
+                    <button id="regButton" class="btn waves-effect waves-light blue lighten-3">Register</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s1 registration_form">
+                    Login:
+                </div>
+                <div class="input-field col s3" id="user">
+                    <input placeholder="Username" id="id_login" type="text">
+                </div>
+                <div class="input-field col s3" id="user">
+                    <input placeholder="Password" id="ps_login" type="password">
+                </div>
+                <div class="col s1 registration_form">
+                    <button id="loginButton" class="btn waves-effect waves-light blue lighten-3">Login</button>
+                </div>
+            </div>
         </div>
         <div id="tableview" class="row">
              <div class="col s6" id="vulnerability_table">
@@ -152,17 +162,22 @@
             </div>
             <div class="col s6" id="verified_sites">
                 <center> Your Verified Websites </center>
-             <table class="highlight">
+             <table class="highlight" id="vsiteTable">
                 <thead>
-                  <tr>
-                      <th data-field="website">Website</th>
-                      <th data-field="last_tested">Last Tested</th>
-                  </tr>
+                <tr>
+                    <th>Verified Domain</th>
+                    <th>Remove</th>
+                </tr>
                 </thead>
                 <tbody>
-
+                    <tr>
+                    <td>www.nodejs.love</td>
+                    <td style="text-align: center;"><a href="#" onclick="removeSite('nodejs.love')">REMOVE</a></td>
+                    </tr>
                 </tbody>
              </table>
+            <input placeholder="Add Website URL" id="ver_site" type="text">
+            <button id="verifyButton" class="btn waves-effect waves-light blue lighten-3">Verify</button>
             </div>
         </div>
         <div class="row">
@@ -186,7 +201,6 @@
             </div>
         </div>
                 <!-- Page Content goes here -->
-        </div>
         </div>
 	</body>
 </html>

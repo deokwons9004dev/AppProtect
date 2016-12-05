@@ -52,6 +52,8 @@ input {
 	margin-left: 10px;
 }
 
+
+
 #faq_text{
 	color:#000000;
 }
@@ -101,4 +103,13 @@ input {
 #site_name{
 	margin-top: 5%;
   margin-left: 40%;
+}
+
+.registration_form{
+    margin-top: 3%;
+}
+
+#log_in_forms{
+	margin-left: 20%;
+	margin-top: 10%;
 }
