@@ -112,16 +112,16 @@ $(document).ready(function() {
   //   $('#disagree_terms_button').click(function () {
 
   //   });
-  //   $( '#type_test' ).change(function() {
-  //   	var x = $( "select option:selected" ).text();
-  //   	if(x=="Website"){
-  //   		$("#search_block").show();
-  //   		$("#testing_inputs").hide();
-  // 		}else{
-  // 			$("#testing_inputs").show();
-  // 			$("#search_block").hide();
-  // 		}
-		// });
+    $( '#type_test' ).change(function() {
+    	var x = $( "select option:selected" ).text();
+    	if(x=="ZAP"){
+    		$("#search_block").show();
+    		$("#testing_inputs").hide();
+  		}else{
+  			$("#testing_inputs").show();
+  			// $("#search_block").hide();
+  		}
+		});
 
 		$('.modal').modal({
       dismissible: false, // Modal can be dismissed by clicking outside of the modal
