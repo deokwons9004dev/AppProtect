@@ -60,7 +60,21 @@
         <div id="legal_modal" class="modal">
             <div class="modal-content">
             <h4>Legal Terms And Conditions</h4>
-            <p>You must abide by the following to use our software</p>
+            <p>You must abide and agree to the following terms and conditions in order to use our software.<br />
+                1. AppProtect will not disclose any data collected with any other users besides those issueing the tests.<br />
+                2. AppProtect will only test websites with users who have verified that they own the tested domain and included a random and unique identifier in the root web directory of the tested domain.<br />
+                3. AppProtect will perform a OWASP Zed Attack Proxy (ZAP) test on a website URL provided by the authenticated user.<br />
+                4. A ZAP attacked is described as follows: The quickest way to get started with ZAP is to use the Quick Start tab, which allows you to enter a single URL that ZAP will attack. ZAP will use its spider to crawl the application, which will automatically passively scan all of the pages discovered. It will then use the active scanner to attack
+                all of the pages. This is a useful way to perform an initial assessment of an application, but it does have some drawbacks. Firstly ZAP will not handle any authentication, which means that it will not discover any pages protected by a login page. Secondly you have much less control of the exploring and attacking phases, its a quick way to get started, but there's much more to ZAP than this (<a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Reference</a>).<br />
+                5. AppProtect will perform a SQL Map test on a website URL provided by the authenticated user.<br />
+                6. A SQL Map is described as follows: sqlmap is an open source penetration testing tool that automates the process of detecting and exploiting SQL injection flaws and taking over of database servers. It comes with a powerful detection engine, many niche features for the ultimate penetration tester and a broad range of switches lasting from database fingerprinting, over data fetching from the database, to accessing the underlying file system and executing commands on the operating system via out-of-band connections (<a href="http://sqlmap.org/">SQL Map Reference</a>).<br />
+                7. AppProtect will only test websites with the previously stated two attacks: ZAP and SQL Map.
+                8. At any point a user can cancel a test on a website which will prevent the test from moving any further.<br />
+                9. AppProtect will not be liable for any data loss or breach that may occur during testing.<br />
+                10. Approtect will not be liable to any results that occure from an attempt to change the source code of this application when
+                testing a website.
+                11. By agreeing to the preceeding terms and conditions you are authorizing AppProtect to abide by the previously stated terms and conditions on behalf of the user of this applicaiton.
+            </p>
             </div>
             <div class="modal-footer">
             <a href="#!" id="agree_terms_button" class=" modal-action modal-close waves-effect waves-green btn-flat green">Agree</a>
@@ -133,7 +147,7 @@
         </div>
         <div id="tableview" class="row">
              <div class="col s6" id="vulnerability_table">
-                <center> Most Common Vulnerabilities Across All User Web Sites </center>
+                <center> Most Common Vulnerabilities Found Across All User Web Sites </center>
              <table class="highlight">
                 <thead>
                   <tr>
