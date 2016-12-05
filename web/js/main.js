@@ -22,33 +22,33 @@ $(document).ready(function() {
 
     $('select').material_select();
 
-  //   $('#cancelButton').click(function () {
-  //   	console.log("Canceled!!");
-  //   });
+    $('#cancelButton').click(function () {
+    	console.log("Canceled!!");
+    });
 
 
-  //   $('#agree_terms_button').click(function () {
-  //   	var test_type;
-  //   	test_type = $( "#type_test" ).val();
+    $('#agree_terms_button').click(function () {
+    	var test_type;
+    	test_type = $( "#type_test" ).val();
 
-  //   	//check to see which entry it is and if something is entered
-  //   	var search_block = $('#search_block').is(":visible");
-  //   	var two_inputs = $('#testing_inputs').is(":visible");
-  //   	var search_one_input = false;
-  //   	var search_two_input = false;
-  //  		var website_url;
-  //  		var username;
-  //  		var password;
+    	//check to see which entry it is and if something is entered
+    	var search_block = $('#search_block').is(":visible");
+    	var two_inputs = $('#testing_inputs').is(":visible");
+    	var search_one_input = false;
+    	var search_two_input = false;
+   		var website_url;
+   		var username;
+   		var password;
 
-  //   	if(search_block){
-  //   		search_one_input = true;
-  //   		website_url = $('#search_text').val();
-  //   	}
-  //   	if(two_inputs){
-  //   		search_two_input = true;
-  //   		username = $('#username').val();
-  //   		password = $('#password').val();
-  //   	}
+    	if(search_block){
+    		search_one_input = true;
+    		website_url = $('#search_text').val();
+    	}
+    	if(two_inputs){
+    		search_two_input = true;
+    		username = $('#username').val();
+    		password = $('#password').val();
+    	}
 
   //   	// error checking
 
@@ -108,7 +108,7 @@ $(document).ready(function() {
   //   		}
 
 
-  //   });
+    });
   //   $('#disagree_terms_button').click(function () {
 
   //   });
@@ -123,17 +123,17 @@ $(document).ready(function() {
   // 		}
 		// });
 
-		// $('.modal').modal({
-  //     dismissible: false, // Modal can be dismissed by clicking outside of the modal
-  //     opacity: .5, // Opacity of modal background
-  //     in_duration: 300, // Transition in duration
-  //     out_duration: 200, // Transition out duration
-  //     starting_top: '4%', // Starting top style attribute
-  //     ending_top: '10%', // Ending top style attribute
-  //     ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
-  //       console.log(modal, trigger);
-  //     },
-  //     complete: function() { console.log('Closed'); } // Callback for Modal close
-  //   }
-  // );
+		$('.modal').modal({
+      dismissible: false, // Modal can be dismissed by clicking outside of the modal
+      opacity: .5, // Opacity of modal background
+      in_duration: 300, // Transition in duration
+      out_duration: 200, // Transition out duration
+      starting_top: '4%', // Starting top style attribute
+      ending_top: '10%', // Ending top style attribute
+      ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+        console.log(modal, trigger);
+      },
+      complete: function() { console.log('Closed'); } // Callback for Modal close
+    }
+  );
   });
