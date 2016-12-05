@@ -19,6 +19,8 @@
  *     MySQL: A NodeJS Driver for MySQL. We use this module along with a normal 
  *            binary distribution of a MySQL Server to manage all user generated data.
  *            (https://www.npmjs.com/package/mysql)
+ *     Colors: Terminal Color Options.
+ *             (https://www.npmjs.com/package/colors)
  *
  * Custom Modules:
  *     Usertools: This module contains user login, registration, 
@@ -45,11 +47,13 @@ var usertools = require("./node_helpers/user_tools.js");
 var testtools = require("./node_helpers/test_tools.js");
 var args      = require("./node_helpers/db_args.js");
 var dbtools   = require("./node_helpers/db_tools.js"); 
+var misctools = require("./node_helpers/misc_tools.js");
 
 /* Import NPM Modules. */
 var express   = require("express");
 var sio       = require("socket.io");
 var mysql     = require("mysql");
+var colors    = require("colors");
 
 /* MySQL Login Data. */
 var MYSQL_ID;        // ID
@@ -77,20 +81,34 @@ var server = http.createServer(app).listen(5001, function () {
 
 /* Import Express Middle-wares. */
 app.use(express.favicon(path.join(__dirname, 'web', 'img','favicon.ico')));
-app.use(express.json());
-app.use(express.urlencoded());
 app.use(express.cookieParser());
+app.use(express.bodyParser());
 app.use(express.static(path.join(__dirname, 'web')));
-//app.use(express.bodyParser()); <-- Bring this back if forms isn't working.
+//app.use(express.json());
+//app.use(express.urlencoded());
+//app.use(express.multipart());
 //app.use(express.cookieSession());
 //app.use(express.logger('dev'));
 
 /* GET Requests */
-app.get('/', function (req,res,next) {
+app.get('/', function (req,res) {
+    log(colors.grey('Server (GET): Main Page Access'));
     fs.readFile("web/index.html", function (err, data) {
         res.send(data.toString());
     });
 });
+/* POST Requests */
+app.post('/loginPost', function (req,res) {
+    log(colors.grey('Server (POST): User Login POST.'));
+    req.body = JSON.parse(req.body.data);
+    usertools.loginUserPOST(client, req, res, ss);
+});
+app.post('/loginSession', function (req,res) {
+    log(colors.grey('Server (POST): User Login Session.'));
+    req.body = JSON.parse(req.body.data);
+    usertools.loginUserSession(req, res, sc, ss);
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
@@ -111,17 +129,23 @@ app.use(function(req, res, next) {
 
 /* Initialize Socket.io */
 var io = sio.listen(server);
+var ss = {}; // Socket Sessions.
+var sc = {}; // Socket Clients.
 /* Install socket event listeners upon connection. */
 io.sockets.on("connection", function (socket) {
     
     /* User Authentication Features */
-    socket.on('login', function (form) {
+    socket.on('session_login', function (form) {
         log('Server (Info): Socket Login Request In.');
-        usertools.loginUser(client, socket, form);
+        usertools.loginUserSession(client, socket, sc, form);
     });
     socket.on('register', function (form) {
         log('Server (Info): Socket Register Request In.');
         usertools.registerUser(client, socket, form);
+    });
+    socket.on('logout', function () {
+        log('Server (Info): Socket Logout Request In.');
+        usertools.logoutUser(client, socket, ss);
     });
     
     /* User Web Server Verification */
@@ -139,11 +163,21 @@ io.sockets.on("connection", function (socket) {
     });
 
     /* Pen Test Features */
-    socket.on("test_request", function (option) {
-        testtools.testzap(client, socket, option);
+    socket.on("test_zap", function (option) {
+        log('Server (Info): Socket ZAP Test request In.');
+        testtools.testzap(client, socket, io, option);
+    });
+    socket.on("test_sqlmap", function (option) {
+        testtools.testsqlmap(client, socket, io, option);
     });
     socket.on("test_cancel", function () {
-        testtools.cancelzap(socket);
+        testtools.canceltest(socket);
+    });
+    
+    /* Data Fetch Features */
+    socket.on("top_list", function () {
+        log('Server (Info): Socket Top List Request In.');
+        dbtools.topList(client, socket);
     });
 
     /* Receives a notification that a client socket left.
@@ -154,8 +188,11 @@ io.sockets.on("connection", function (socket) {
      */
     socket.on("disconnect", function () {
         log("Server (Info): Client (%s) left.", socket.id);
-//        log('Server (Info): Rooms\n',io.sockets.adapter.rooms);
+        delete sc[socket.id]; // Remove the socket from the Socket Client Dictionary.
     });
 
-    log("SIO: New Client: " + socket.id);
+    socket.leave(socket.id);
+    sc[socket.id] = socket; // Add every socket connection to the Socket Client Dictionary.
+
+    log("SIO: New Client:", misctools.parseCookies(socket.handshake.headers.cookie));
 });

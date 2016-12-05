@@ -12,6 +12,10 @@
 var cp  = require("child_process");
 var log = console.log.bind(this);
 
+/* Import NPM Modules. */
+var async     = require("async");
+var colors    = require("colors");
+
 /** 
  *Installs Database via script and connects to DB Jchat.
  *
@@ -48,3 +52,24 @@ exports.initDB = function (mysql_id, mysql_ps, client, db, callback) {
 	});
 }
 
+exports.topList = function (client, socket) {
+	async.waterfall([
+		function (callback) {
+			client.query('SELECT * FROM Toplist ORDER BY vul_count DESC LIMIT 5', function (error, result) {
+				if (error)
+					callback({ name: 'top_list_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
+				else callback(null, result);
+			});
+		}
+	], function (error, topResults) {
+		if (error) {
+			log(colors.red('Server (Error):', error.name));
+			log(colors.red('Server (Cause):', error.cause));
+			socket.emit(error.name, error.cause);
+		}
+		else {
+			log(colors.green('Server (Info): Top List Successfully Sent.'));
+			socket.emit('top_list_success', topResults);
+		}
+	});
+}

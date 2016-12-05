@@ -57,6 +57,7 @@ $('#tokenButton').click(function () {
 	socket.emit('verify_token');
 });    
 $('#verifyButton').click(function () {
+	console.log($('#ver_site').val());
 	socket.emit('verify_request', {
 		url: $('#ver_site').val()
 	});

@@ -10,6 +10,8 @@ app.use(express.bodyParser({uploadDir: __dirname + '/../Data/temp'}));
 app.use(app.router);
 app.use("/",express.static(__dirname+"/../Web"));
 app.use(function (req,res,next) {
+	console.log(req.connection.remoteAddress);
+	console.log(req.headers);
 //	var proxy = http.createClient(80, request.headers['host'])
 //	var proxy_request = proxy.request(request.method, request.url, request.headers);
 //	proxy_request.addListener('response', function (proxy_response) {
@@ -29,25 +31,25 @@ app.use(function (req,res,next) {
 //	request.addListener('end', function() {
 //		proxy_request.end();
 //	});
-	console.log(req.url);
-//	console.log(response);
-//	response.send('<h1>Hi!</h1>');
-	var options = {
-		url   : req.url,
-		method: req.method,
-		headers: req.headers,
-		
-		json: true,
-		body: req.body,
-	}
-	request(options, function (error, resp, body) {
-		if (error) console.log(error);
-		else {
-			console.log(body);
-			
-			res.send(body);
-		}
-	});
+//	console.log(req.url);
+////	console.log(response);
+////	response.send('<h1>Hi!</h1>');
+//	var options = {
+//		url   : req.url,
+//		method: req.method,
+//		headers: req.headers,
+//		
+//		json: true,
+//		body: req.body,
+//	}
+//	request(options, function (error, resp, body) {
+//		if (error) console.log(error);
+//		else {
+//			console.log(body);
+//			
+//			res.send(body);
+//		}
+//	});
 //	next();
 });
 

@@ -85,7 +85,7 @@ exports.parseXML = function (socket, xmlpath, callback) {
 				}
 			});
 			/* Notify the client that the parsing is complete. */
-			socket.emit('progress_zap_6_parse_done');
+			socket.emit('progress_zap_7_parse_done');
 			/* Return callback. */
 			return callback(undefined, scan);
 		}

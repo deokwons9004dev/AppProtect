@@ -38,7 +38,9 @@ var colors    = require("colors");
 var validator = require("validator");
 
 /* Custom Module Import */
-var dbs = require("./DB_Strings.js"); // Database Query Strings.
+var misctools = require("./misc_tools.js");
+var restools  = require("./res_tools.js");  // HTTP Response Tools.
+var dbs       = require("./DB_Strings.js"); // Database Query Strings.
 
 /* Checks if a socket has a valid session generated upon login. (WATERFALL)
  *
@@ -56,7 +58,7 @@ exports.isValidSession = function (socket, callback) {
 	if (!socket.session)
 		callback({ cause: 'EMPTY_SESSION' });
 	else if (socket.session.ip     !== socket.request.connection.remoteAddress ||
-		socket.session.uagent !== socket.handshake.headers['user-agent'])
+			 socket.session.uagent !== socket.handshake.headers['user-agent'])
 		callback({ cause: 'SESSION_MISMATCH' });
 	else callback(null);
 }
@@ -93,11 +95,11 @@ exports.isUserExists = function (client, user, callback) {
  */
 exports.isURLValid = function (url, callback) {
 	if (!validator.isURL(url)) callback({ cause: 'INVALID_URL' });
-    else                       callback(null);
+	else                       callback(null);
 }
 exports.isURLValidStrict = function (url, callback) {
 	if (!validator.isURL(url, {'require_protocol' : true})) 
-        callback({ cause: 'INVALID_URL_STRICT' });
+		callback({ cause: 'INVALID_URL_STRICT' });
 	else callback(null);
 }
 var isValidSession   = exports.isValidSession;
@@ -204,42 +206,87 @@ exports.registerUser = function (client, socket, form) {
  * @results {Socket Event} login_reject : If any part of the process fails.
  *                         login_success: If the user is authenticated.
  */
-exports.loginUser = function (client, socket, form) {
+exports.loginUserSession = function (req, res, sc, ss) {
+	async.waterfall([
+		function (callback) {
+			var userAuth = req.cookies.userAuth;
+			/* If User Auth Cookie Simply does not exist. */
+			if (!userAuth)
+				callback({ name: 'login_session_reject', cause: 'UA_COOKIES_NON_EXIST' });
+			/* If there is no UA in Socket Sessions. */
+			else if (!ss[userAuth])
+				callback({ name: 'login_session_reject', cause: 'SS_NO_UA' });
+			/* If there is no socket matching the client Socket ID. */
+			else if (!sc[req.body.sid])
+				callback({ name: 'login_session_reject', cause: 'SC_NO_SOCKET' });
+			/* If the IP and Uagent doesn't match. */
+			else if (ss[userAuth].ip     != req.connection.remoteAddress ||
+					 ss[userAuth].uagent != req.headers['user-agent'])
+				callback({ name: 'login_session_reject', cause: 'SS_INVALUD_UA' });
+			/* UA successfully identified and user session loaded to socket. */
+			else {
+				sc[req.body.sid].session = ss[userAuth];
+				sc[req.body.sid].session.userAuth = userAuth;
+				callback(null);
+			}
+		}
+	], function (error) {
+		/* If there was an error along the way, notify the client. */
+		if (error) {
+			log(colors.red('Server (Error):', error.name));
+			log(colors.red('Server (Cause):', error.cause));
+			log(colors.red('Server (Cause2):', error.cause2));
+			restools.sendResponseSimple(res, error.name, 'fail', error.cause, error.cause);
+		}
+		/* If everything went well, notify the client. */
+		else {
+			log(colors.green('Server (Info): User session successfully loaded.'));
+			restools.sendResponseSimple(res, 'login_session', 'success');
+		}
+	});
+}       
+
+exports.loginUserPOST = function (client, req, res, ss) {
 	async.waterfall([
 		/* Check if ID contains unsafe characters. */
 		function (callback) {
-			if (form.id !== escape(form.id)) 
-				callback({ name: 'login_reject', cause: 'INVALID_ID_CHARACTERS' });
+			if (req.body.id !== escape(req.body.id)) 
+				callback({ name: 'login_post_reject', cause: 'INVALID_ID_CHARACTERS' });
 			else callback(null);
 		},
 		/* Check if ID string is not empty AND does not exceed 100 characters. */
 		function (callback) {
-			if (form.id.length > 100 || form.id.length < 1) 
-				callback({ name: 'login_reject', cause: 'INVALID_ID_LENGTH' });
+			if (req.body.id.length > 100 || req.body.id.length < 1) 
+				callback({ name: 'login_post_reject', cause: 'INVALID_ID_LENGTH' });
 			else callback(null);
 		},
 		/* Check if PS string is not empty AND does not exceed 100 characters. */
 		function (callback) {
-			if (form.ps.length > 100 || form.ps.length < 1) 
-				callback({ name: 'login_reject', cause: 'INVALID_PS_LENGTH' });
+			if (req.body.ps.length > 100 || req.body.ps.length < 1) 
+				callback({ name: 'login_post_reject', cause: 'INVALID_PS_LENGTH' });
 			else callback(null);
 		},
 		/* Check if the given ID exists in the database. */
 		function (callback) {
-			client.query(dbs.userExists, [form.id], function (error, result) {
+			client.query(dbs.userExists, [req.body.id], function (error, result) {
 				if (error) 
-					callback({ name: 'login_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
+					callback({ name: 'login_post_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
 				else if (result.length == 0)
-					callback({ name: 'login_reject', cause: 'ID_NON_EXIST' });
-				else if (!bcp.compareSync(form.ps, result[0].user_ps))
-					callback({ name: 'login_reject', cause: 'PS_INCORRECT' });
+					callback({ name: 'login_post_reject', cause: 'ID_NON_EXIST' });
+				else if (!bcp.compareSync(req.body.ps, result[0].user_ps))
+					callback({ name: 'login_post_reject', cause: 'PS_INCORRECT' });
 				else {
-					/* Create Server-side Session with Connection Information. */
-					socket.session = {
-						user    : result[0].user_id,                       // User ID.
-                        token   : result[0].user_tok,                      // User Verification Token.
-						ip      : socket.request.connection.remoteAddress, // Connection IP Address.
-						uagent  : socket.handshake.headers['user-agent']   // Connection User Agent String.
+					var authCode = uuid.v4();                   // Generate Auth Code (UUID)
+					res.cookie('userAuth', authCode, {          // Add Auth Code to Cookie.
+						path    : '/',
+						httpOnly: true,
+						secure  : false
+					});           
+					ss[authCode] = {                            
+						user    : result[0].user_id,            // User ID.
+						token   : result[0].user_tok,           // User Verification Token.
+						ip      : req.connection.remoteAddress, // Connection IP Address.
+						uagent  : req.headers['user-agent']     // Connection User Agent String.
 					}
 					return callback(null);
 				}
@@ -251,15 +298,67 @@ exports.loginUser = function (client, socket, form) {
 			log(colors.red('Server (Error):', error.name));
 			log(colors.red('Server (Cause):', error.cause));
 			log(colors.red('Server (Cause2):', error.cause2));
+			restools.sendResponseSimple(res, error.name, 'fail', error.cause, error.cause);
+		}
+		/* If everything went well, notify the client. */
+		else {
+			log(colors.green('Server (Info): User successfully logged in.'));
+			restools.sendResponseSimple(res, 'login_post', 'success');
+		}
+	});
+} 
+
+/* Checks for login information in DB and creates a new session.
+ *
+ * This can fail either by:
+ * 1) ID containing invalid characters.
+ * 2) ID not existing.
+ * 3) ID or PS over 100 characters.
+ * 4) MySQL Query Failure.
+ * 5) Password Mismatch.
+ * Otherwise it will send a success signal to the user.
+ *
+ * @param client: Current MySQL Database Connection.
+ * @param socket: Current Socket.io Connection.
+ * @param form  : Object containing new ID and PS.
+ *
+ * @return none.
+ *
+ * @results {Socket Event} login_reject : If any part of the process fails.
+ *                         login_success: If the user is authenticated.
+ */
+exports.logoutUser = function (client, socket, ss) {
+	async.waterfall([
+		function (callback) { isValidSession(socket, callback); },
+		function (callback) { isUserExists(client, socket.session.user, callback); },
+		function (callback) {
+			/* If there is no UA in Socket Sessions. */
+			if (!socket.session.userAuth)
+				callback({ name: 'logout_reject', cause: 'SOCKET_NO_AUTH' });
+			/* If there is no UA in Socket Sessions. */
+			if (!ss[socket.session.userAuth])
+				callback({ name: 'logout_reject', cause: 'SS_NO_UA' });
+			else {
+				delete ss[socket.session.userAuth]; // Delete session from socket sessions.
+				delete socket.session;              // Delete session from socket.
+				callback(null);
+			}
+		}
+	], function (error) {
+		/* If there was an error along the way, notify the client. */
+		if (error) {
+			log(colors.red('Server (Error):', error.name));
+			log(colors.red('Server (Cause):', error.cause));
+			log(colors.red('Server (Cause2):', error.cause2));
 			socket.emit(error.name, error.cause);
 		}
 		/* If everything went well, notify the client. */
 		else {
-			log(colors.green('Server (Info): User successfully logged in.', socket.session.user));
-			socket.emit('login_success', socket.session.user);
+			log(colors.green('Server (Info): User session successfully loaded.'));
+			socket.emit('logout_success');
 		}
 	});
-}
+}  
 
 /* Extracts the user's token and sends it to the client.
  *
@@ -271,84 +370,84 @@ exports.loginUser = function (client, socket, form) {
  *                         verify_token_success: If the token was successfully received.
  */
 exports.verifyToken = function (socket) {
-    log(colors.green('Server (Info): User Token Sent.'));
-    socket.emit('verify_token_success', socket.session.token);
+	log(colors.green('Server (Info): User Token Sent.'));
+	socket.emit('verify_token_success', socket.session.token);
 }
 
 exports.getVerifiedSites = function (client, socket) {
-    async.waterfall([
-        function (callback) { isValidSession(socket, callback); },
-        function (callback) { isUserExists(client, socket.session.user, callback); },
-        /* Check site duplicates and add new site. */
-        function (callback) {
-            client.query('SELECT * FROM Users WHERE user_id = ?', [socket.session.user], function (error, result) {
-                if (error) 
-                    callback({ name: 'get_verified_sites_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
-                else {
-                    var sites = JSON.parse(result[0].user_sites);
-                    callback(null, sites);
-                }
-            });
-        }
-    ], function (error, sites) {
-        /* If there was an error along the way, notify the client. */
-        if (error) {
-            log(colors.red('Server (Error):', error.name || 'get_verified_sites_reject'));
-            log(colors.red('Server (Cause):', error.cause));
-            log(colors.red('Server (Cause2):', error.cause2));
-            socket.emit(error.name || 'get_verified_sites_reject', error.cause);
-        }
-        /* If everything went well, send the token string to the client. */
-        else {
-            log(colors.green('Server (Info): Sent Verified Websites.'));
-            socket.emit('get_verified_sites_success', sites);
-        }
-    });
+	async.waterfall([
+		function (callback) { isValidSession(socket, callback); },
+		function (callback) { isUserExists(client, socket.session.user, callback); },
+		/* Check site duplicates and add new site. */
+		function (callback) {
+			client.query('SELECT * FROM Users WHERE user_id = ?', [socket.session.user], function (error, result) {
+				if (error) 
+					callback({ name: 'get_verified_sites_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
+				else {
+					var sites = JSON.parse(result[0].user_sites);
+					callback(null, sites);
+				}
+			});
+		}
+	], function (error, sites) {
+		/* If there was an error along the way, notify the client. */
+		if (error) {
+			log(colors.red('Server (Error):', error.name || 'get_verified_sites_reject'));
+			log(colors.red('Server (Cause):', error.cause));
+			log(colors.red('Server (Cause2):', error.cause2));
+			socket.emit(error.name || 'get_verified_sites_reject', error.cause);
+		}
+		/* If everything went well, send the token string to the client. */
+		else {
+			log(colors.green('Server (Info): Sent Verified Websites.'));
+			socket.emit('get_verified_sites_success', sites);
+		}
+	});
 }
 
 exports.removeVerifiedSite = function (client, socket, site) {
-    async.waterfall([
-        function (callback) { isValidSession(socket, callback); },
-        function (callback) { isUserExists(client, socket.session.user, callback); },
-        /* Check site duplicates and add new site. */
-        function (callback) {
-            client.query('SELECT * FROM Users WHERE user_id = ?', [socket.session.user], function (error, result) {
-                if (error) 
-                    callback({ name: 'remove_verified_site_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
-                else {
-                    var sites = JSON.parse(result[0].user_sites);
-                    var index = sites.indexOf(site);
-                    if (index == -1) 
-                        callback({ name: 'remove_verified_site_reject', cause: 'SITE_NON_EXIST' });
-                    else {
-                        sites.splice(index, 1);
-                        callback(null, sites);
-                    }
-                }
-            });
-        },
-        /* Update user's site record. */
-        function (sites, callback) {
-            client.query('UPDATE Users SET user_sites = ? WHERE user_id = ?', [JSON.stringify(sites), socket.session.user], function (error) {
-                if (error) 
-                    callback({ name: 'remove_verified_site_reject', cause: 'DATABASE_UPDATE_FAIL', cause2: error });
-                else callback(null);
-            });
-        }
-    ], function (error, sites) {
-        /* If there was an error along the way, notify the client. */
-        if (error) {
-            log(colors.red('Server (Error):', error.name || 'remove_verified_site_reject'));
-            log(colors.red('Server (Cause):', error.cause));
-            log(colors.red('Server (Cause2):', error.cause2));
-            socket.emit(error.name || 'remove_verified_site_reject', error.cause);
-        }
-        /* If everything went well, send the token string to the client. */
-        else {
-            log(colors.green('Server (Info): Removed Verified Website.'));
-            socket.emit('remove_verified_site_success');
-        }
-    });
+	async.waterfall([
+		function (callback) { isValidSession(socket, callback); },
+		function (callback) { isUserExists(client, socket.session.user, callback); },
+		/* Check site duplicates and add new site. */
+		function (callback) {
+			client.query('SELECT * FROM Users WHERE user_id = ?', [socket.session.user], function (error, result) {
+				if (error) 
+					callback({ name: 'remove_verified_site_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
+				else {
+					var sites = JSON.parse(result[0].user_sites);
+					var index = sites.indexOf(site);
+					if (index == -1) 
+						callback({ name: 'remove_verified_site_reject', cause: 'SITE_NON_EXIST' });
+					else {
+						sites.splice(index, 1);
+						callback(null, sites);
+					}
+				}
+			});
+		},
+		/* Update user's site record. */
+		function (sites, callback) {
+			client.query('UPDATE Users SET user_sites = ? WHERE user_id = ?', [JSON.stringify(sites), socket.session.user], function (error) {
+				if (error) 
+					callback({ name: 'remove_verified_site_reject', cause: 'DATABASE_UPDATE_FAIL', cause2: error });
+				else callback(null);
+			});
+		}
+	], function (error, sites) {
+		/* If there was an error along the way, notify the client. */
+		if (error) {
+			log(colors.red('Server (Error):', error.name || 'remove_verified_site_reject'));
+			log(colors.red('Server (Cause):', error.cause));
+			log(colors.red('Server (Cause2):', error.cause2));
+			socket.emit(error.name || 'remove_verified_site_reject', error.cause);
+		}
+		/* If everything went well, send the token string to the client. */
+		else {
+			log(colors.green('Server (Info): Removed Verified Website.'));
+			socket.emit('remove_verified_site_success');
+		}
+	});
 }
 
 /* Verifies a user's website for ownership and adds to site records.
@@ -374,17 +473,17 @@ exports.verifyRequest = function (client, socket, form) {
 	async.waterfall([
 		function (callback) { isValidSession(socket, callback); },
 		function (callback) { isUserExists(client, socket.session.user, callback); },
-        /* Check and modify valid URL to at least be http:// */
+		/* Check and modify valid URL to at least be http:// */
 		function (callback) {
-            if (!validator.isURL(form.url, {'require_protocol' : true})) {
-                if (!validator.isURL(form.url)) callback({ cause: 'INVALID_URL' });
-                else {
-                    form.url = 'http://' + form.url;
-                    callback(null);
-                }
-            } 
-            else callback(null);
-        },
+			if (!validator.isURL(form.url, {'require_protocol' : true})) {
+				if (!validator.isURL(form.url)) callback({ cause: 'INVALID_URL', cause2: form.url });
+				else {
+					form.url = 'http://' + form.url;
+					callback(null);
+				}
+			} 
+			else callback(null);
+		},
 		/* Send Test Request to client. */
 		function (callback) {
 			request(form.url + '/' + socket.session.token, function (error, res, body) {
@@ -401,11 +500,12 @@ exports.verifyRequest = function (client, socket, form) {
 				if (error) 
 					callback({ name: 'verify_request_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
 				else {
-					var sites = JSON.parse(result[0].user_sites);
-					if (sites.indexOf(form.url) != -1)
+					var sites  = JSON.parse(result[0].user_sites);
+					var domain = misctools.extractDomain(form.url)
+					if (sites.indexOf(domain) != -1)
 						callback({ name: 'verify_request_reject', cause: 'SITE_ALREADY_VERIFIED' });
 					else {
-						sites.push(form.url);
+						sites.push(domain);
 						callback(null, sites);
 					}
 				}

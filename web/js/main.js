@@ -1,54 +1,55 @@
+$(window).unload(function () {
+    socket.emit('logout');
+});
+
 $(document).ready(function() {
+  
+  /* Hide User Panels By Default.
+   * 
+   * A POST Request will be automatically sent to 
+   * check whether the user has login cookies. If so, 
+   * these panels will appear, and the login form will 
+   * disappear.
+   */
+    changeView('login');
+//  $('.logged_in').hide();
+//  $('#verified_sites').hide();
+//  $('#vulnerability_table').hide();
 
-
-	//check if user is logged in cookie
-	if (false){
-		//not logged in
-		$('.logged_in').hide();
-		$('#verified_sites').hide();
-		$('#vulnerability_table').hide();
-	} else {
-		//have cookie
-		$('.logged_in').show();
-		$('#verified_sites').show();
-		$('#vulnerability_table').show();
-		$('#log_in_forms').hide();
-	}
-
-
-	$('#tokenButton').click(function () {
-    	console.log("tokenButton!!");
-   });
+    /* This event is taken care of. */
+//	$('#tokenButton').click(function () {
+//    	console.log("tokenButton!!");
+//   });
 
     $('select').material_select();
 
-    $('#cancelButton').click(function () {
-    	console.log("Canceled!!");
-    });
+//    $('#cancelButton').click(function () {
+//    	console.log("Canceled!!");
+//    });
 
 
-    $('#agree_terms_button').click(function () {
-    	var test_type;
-    	test_type = $( "#type_test" ).val();
-
-    	//check to see which entry it is and if something is entered
-    	var search_block = $('#search_block').is(":visible");
-    	var two_inputs = $('#testing_inputs').is(":visible");
-    	var search_one_input = false;
-    	var search_two_input = false;
-   		var website_url;
-   		var username;
-   		var password;
-
-    	if(search_block){
-    		search_one_input = true;
-    		website_url = $('#search_text').val();
-    	}
-    	if(two_inputs){
-    		search_two_input = true;
-    		username = $('#username').val();
-    		password = $('#password').val();
-    	}
+//    $('#agree_terms_button').click(function () {
+//    	var test_type;
+//    	test_type = $( "#type_test" ).val();
+//      console.log('Test Type:',test_type);
+//    	//check to see which entry it is and if something is entered
+//    	var search_block = $('#search_block').is(":visible");
+//    	var two_inputs = $('#testing_inputs').is(":visible");
+//    	var search_one_input = false;
+//    	var search_two_input = false;
+//   		var website_url;
+//   		var username;
+//   		var password;
+//
+//    	if(search_block){
+//    		search_one_input = true;
+//    		website_url = $('#search_text').val();
+//    	}
+//    	if(two_inputs){
+//    		search_two_input = true;
+//    		username = $('#username').val();
+//    		password = $('#password').val();
+//    	}
 
   //   	// error checking
 
@@ -108,7 +109,7 @@ $(document).ready(function() {
   //   		}
 
 
-    });
+//    });
   //   $('#disagree_terms_button').click(function () {
 
   //   });
