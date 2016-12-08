@@ -57,9 +57,14 @@ var dbs       = require("./DB_Strings.js"); // Database Query Strings.
 exports.isValidSession = function (socket, callback) {
 	if (!socket.session)
 		callback({ cause: 'EMPTY_SESSION' });
-	else if (socket.session.ip     !== socket.request.connection.remoteAddress ||
-			 socket.session.uagent !== socket.handshake.headers['user-agent'])
-		callback({ cause: 'SESSION_MISMATCH' });
+	else if (socket.session.ip     !== (socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress) ||
+			 socket.session.uagent !== socket.handshake.headers['user-agent']) {
+//			log(socket.session);
+//			log(socket.request.connection.remoteAddress);
+			log(socket.handshake.headers);
+			callback({ cause: 'SESSION_MISMATCH' });
+		}
+		
 	else callback(null);
 }
 /* Checks if a user id exists in the database. (WATERFALL)
@@ -213,14 +218,14 @@ exports.loginUserSession = function (req, res, sc, ss) {
 			/* If User Auth Cookie Simply does not exist. */
 			if (!userAuth)
 				callback({ name: 'login_session_reject', cause: 'UA_COOKIES_NON_EXIST' });
-			/* If there is no UA in Socket Sessions. */
+			/* If there is no UAC in Socket Sessions. */
 			else if (!ss[userAuth])
 				callback({ name: 'login_session_reject', cause: 'SS_NO_UA' });
 			/* If there is no socket matching the client Socket ID. */
 			else if (!sc[req.body.sid])
 				callback({ name: 'login_session_reject', cause: 'SC_NO_SOCKET' });
 			/* If the IP and Uagent doesn't match. */
-			else if (ss[userAuth].ip     != req.connection.remoteAddress ||
+			else if (ss[userAuth].ip     != (req.headers['x-forwarded-for'] ||  req.connection.remoteAddress) ||
 					 ss[userAuth].uagent != req.headers['user-agent'])
 				callback({ name: 'login_session_reject', cause: 'SS_INVALUD_UA' });
 			/* UA successfully identified and user session loaded to socket. */
@@ -281,11 +286,13 @@ exports.loginUserPOST = function (client, req, res, ss) {
 						path    : '/',
 						httpOnly: true,
 						secure  : false
-					});           
+					});
+//                   log(req.headers);
+//                   log(req.connection);
 					ss[authCode] = {                            
 						user    : result[0].user_id,            // User ID.
 						token   : result[0].user_tok,           // User Verification Token.
-						ip      : req.connection.remoteAddress, // Connection IP Address.
+						ip      : req.headers['x-forwarded-for'] ||  req.connection.remoteAddress, // Connection IP Address.
 						uagent  : req.headers['user-agent']     // Connection User Agent String.
 					}
 					return callback(null);
@@ -359,6 +366,11 @@ exports.logoutUser = function (client, socket, ss) {
 		}
 	});
 }  
+
+
+
+
+
 
 /* Extracts the user's token and sends it to the client.
  *
@@ -501,7 +513,7 @@ exports.verifyRequest = function (client, socket, form) {
 					callback({ name: 'verify_request_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
 				else {
 					var sites  = JSON.parse(result[0].user_sites);
-					var domain = misctools.extractDomain(form.url)
+					var domain = misctools.extractDomain(form.url);
 					if (sites.indexOf(domain) != -1)
 						callback({ name: 'verify_request_reject', cause: 'SITE_ALREADY_VERIFIED' });
 					else {

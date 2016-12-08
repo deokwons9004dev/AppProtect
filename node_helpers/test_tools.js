@@ -33,11 +33,15 @@ var log  = console.log.bind(this); // Bind print function for easier typing.
 var xmlparse  = require("./xml_parse.js");
 var zapchild  = require("./zap_child.js");
 var misctools = require("./misc_tools.js");
+var usertools = require("./user_tools.js");
+var proxytools = require("./proxy_tools.js");
+var sqmptools = require("./sqmp_tools.js");
 
 /* Import NPM Modules. */
 var validator = require("validator");
 var async     = require("async");
 var colors    = require("colors");
+var uuid      = require("node-uuid"); 
 
 /* Receives a request for a pentest and proceeds with the following.
  *
@@ -68,6 +72,8 @@ var colors    = require("colors");
  */
 exports.testzap = function (client, socket, io, option) {
 	async.waterfall([
+        function (callback) { usertools.isValidSession(socket, callback); },
+        function (callback) { usertools.isUserExists(client, socket.session.user, callback); },
 		/* Step 1 */
 		function (callback) {
 			if (!validator.isURL(option.url, {'require_protocol': true})) {
@@ -135,16 +141,23 @@ exports.testzap = function (client, socket, io, option) {
                     var alerts     = {};
                     var alerts_arr = [];
                     var alerts_top = [];
+                    /* results: Array of DB Query Results
+                     * result : Each DB Query item in Results.
+                     * item   : Each vulnerability item in Result.
+                     */
                     results.forEach(function (result) {
                         JSON.parse(result.test_result).forEach(function (item) {
                             if (!alerts[item.alert]) alerts[item.alert] = 1;
                             else                     alerts[item.alert]++;
                         });
                     });
+                    /* Convert the dictionary object alerts into array alerts_arr. */
                     Object.keys(alerts).forEach(function (item, i) {
                         alerts_arr.push({ name: item, count: alerts[item] });
                     });
+                    /* Sort the array by the instance count of vulnerabilities. */
                     alerts_arr.sort(function (a, b) { a.count - b.count });
+                    /* Assign alerts_top to the top 5 from alerts_arr. */
                     alerts_top = alerts_arr.slice(0,5);
                     callback(null, testResult, alerts_top);
                 }
@@ -182,6 +195,82 @@ exports.testzap = function (client, socket, io, option) {
 	});
 }
 
+/* SQL MAP Test */
+exports.testsqlmap = function (client, socket, io, option) {
+	async.waterfall([
+        /* Check: Valid Session. */
+        function (callback) { usertools.isValidSession(socket, callback); },
+        /* Check: User Existence in Database. */
+        function (callback) { usertools.isUserExists(client, socket.session.user, callback); },
+		/* Check: Valid URL or at least valid domain. */
+		function (callback) {
+			if (!validator.isURL(option.url, {'require_protocol': true})) {
+				if (validator.isURL(option.url)) {
+					option.url = 'http://' + option.url;
+					callback(null);
+				}
+				else callback({ name: 'test_sqlmap_reject', cause: 'INVALID_URL' });
+			}
+			else callback(null);
+		},
+        /* Check: Other Options are valid. */
+        function (callback) {
+            var supportedDB = ['MySQL', 'Oracle', 'PostgreSQL', 'SQLite'];
+            if (option.db != null && supportedDB.indexOf(option.db) == -1)
+                callback({ name: 'test_sqlmap_reject', cause: 'UNSUPPORTED_DB' });
+            else if (option.level < 1 || option.level > 5)
+                callback({ name: 'test_sqlmap_reject', cause: 'LEVEL_OUT_OF_RANGE' });
+            else if (option.risk < 1 || option.risk > 3)
+                callback({ name: 'test_sqlmap_reject', cause: 'RISK_OUT_OF_RANGE' });
+            else callback(null);
+        },
+        /* Check: Domain is verified by the user. */
+        function (callback) {
+            client.query('SELECT * FROM Users WHERE user_id = ?', [socket.session.user], function (error, result) {
+                if (error) 
+                    callback({ name: 'test_sqlmap_reject', cause: 'DATABASE_QUERY_FAIL', cause2: error });
+                else {
+                    var sites  = JSON.parse(result[0].user_sites);
+                    var domain = misctools.extractDomain(option.url)
+                    if (sites.indexOf(domain) == -1)
+                        callback({ name: 'test_sqlmap_reject', cause: 'SITE_NOT_VERIFIED' });
+                    else callback(null);
+                }
+            });
+        },
+		/* Exec: Listen to POST Request made by the user. */ 
+		function (callback) {
+			proxytools.listenPOST(socket, misctools.extractDomain(option.url), function (error, req, req_path) {
+                if (error)
+                    callback({ name: 'test_sqlmap_reject', cause: 'PROXY_CRASH', cause2: error });
+                else callback(null, req_path);
+            });
+		},
+		/* Exec: Use the request into SQLMAP and get text results. */
+		function (path, callback) {
+			sqmptools.execSQLMAP(socket, option, path, function (error) {
+                if (error)
+                    callback({ name: 'test_sqlmap_reject', cause: 'SQMP_CRASH', cause2: error });
+                else callback(null);
+            });
+		}
+	], function (error, result) {
+		/* Step 4a */
+		if (error) {
+			log(colors.red('Server (Error):', error.name));
+			log(colors.red('Server (Cause):', error.cause));
+			socket.emit(error.name, error.cause);
+		}
+		/* Step 4b */
+		else {
+			log(colors.green('Server (Info): SQLMAP test finished.'));
+			socket.emit('test_sqlmap_success');
+		}
+		socket.sqchild = null;
+	});
+}
+
+
 /* Receives a request for a cancelling any current test.
  *
  * Step 1)  Check if the socket has a child process running on its behalf.
@@ -196,9 +285,8 @@ exports.testzap = function (client, socket, io, option) {
  *                                 2nd Arg  : none.
  */
 exports.canceltest = function (socket) {
-	/* Step 1 */
-	if (socket.child != null || socket.child != undefined) {
-		
+	/* Terminate ZAP Process. */
+	if (!socket.child) {
 		zapchild.ports_used.splice(zapchild.ports_used.indexOf(socket.port), 1);
 		socket.child.kill('SIGTERM');
 		socket.port = null;
@@ -207,7 +295,30 @@ exports.canceltest = function (socket) {
 		clearInterval(socket.timer_zap_file);
 		
 		log(colors.green('Server (Info): ZAP test cancelled.'));
-		
-		socket.emit('test_cancel_success');
 	}
+    /* Terminate SQLMAP Process. */
+    if (!socket.sqchild) {
+        socket.sqchild.kill('SIGTERM');
+        socket.sqchild = null;
+    }
+    socket.emit('test_cancel_success');
 }
+
+exports.newSocketFiller = function (socket) {
+    /* Generate Random String, and assign to socket.filler */
+    var filler = uuid.v4().split('-')[4];
+    socket.filler = filler;
+    socket.emit('get_filler_success', filler);
+}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -38,22 +38,6 @@ $('#logoutButton').click(function () {
 /** 
  * External Functions 
  */
-//function loadUserPanel() {
-//	var loc_str = window.location.href;
-//	var loc = window.location.href.split('/').pop();
-//	console.log('Current Location: ' + loc);
-//	
-//	/* Load User Panels
-//	 * 
-//	 * This event is sent to the client after the 
-//	 * socket session has successfully loaded all 
-//	 * user data, so it will change the UI to the 
-//	 * logged in user panel view.
-//	 */
-//	changeView('panel');
-//	getVerifiedSites();               // Fetch user's verified sites.
-//	getTopList();                     // Fetch Top 5 Vulnerabilities.
-//}
 
 
 /** 
@@ -117,7 +101,7 @@ function userLoginSession() {
 	}
 	sendPost(ap_url, "/loginSession", dict, function (res) {
 		if (res.result == "fail"){
-			alert("Error while logging in.\n" + 
+			console.log("Error while logging in.\n" + 
 			res.reason + "\n" +
 			res.reason_detail);
 		}

@@ -19,6 +19,9 @@ h4 {
 h5 {
     font-size: 16px;
 }
+h6 {
+    font-size: 14px;
+}
 .green_button {
 	background-color: #4CAF50;
 	border: none;
@@ -83,13 +86,13 @@ input {
 }
 
 #vulnerability_table{
-	margin-top: 10%;
-	padding-right: 50px;
-	padding-left: 75px;
+	margin-top: 5%;
+	padding-right: 20px;
+	padding-left: 20px;
 }
 #verified_sites{
-	margin-top: 10%;
-	padding-right: 100px;
+	margin-top: 5%;
+	padding-right: 0px;
 }
 
 #agree_terms_button{
@@ -107,14 +110,21 @@ input {
 }
 
 #result {
-	overflow:auto;
+	overflow        : auto;
+    background-color: #f2f2f2;
+    margin-top      : 20px;
+    margin-left     : 50px;
+    margin-right    : 50px;
 }
 
 #cancelButton{
-	margin-top: 5%;
-  margin-left: 40%;
+	margin-top : 20px;
+    margin-left: 40%;
 }
-
+#backButton{
+	margin-top : 20px;
+    margin-left: 40%;
+}
 #site_name{
 	margin-top: 5%;
   margin-left: 40%;

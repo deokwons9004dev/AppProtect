@@ -3,7 +3,7 @@ var ap_url_public       = 'http://aprotect.org';
 var ap_url_local        = 'http://localhost:5001';
 var ap_url_secure       = 'https://aprotect.org';
 var ap_url_secure_local = 'https://localhost:5002';
-var ap_url              = ap_url_local;
+var ap_url              = ap_url_secure;
 
 /* AJAX Request Functions */
 function sendPost(host,path,dict,callback) {

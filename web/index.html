@@ -2,11 +2,11 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>App Protect Test</title>
+		<title>AppProtect</title>
         <!-- Non-fancy StyleSheet for now. -->
         <link rel="stylesheet" type="text/css" href="css/ap_beta1.css" />
         <!-- Downloaded Scripts -->
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="/js/mod_is.js"></script>
         <script src="/js/mod_filesaver_text.js"></script>
         <script src="/socket.io/socket.io.js"></script>
@@ -58,8 +58,8 @@
 	<body>
         <div class="container">
             <nav>
-            <div class="nav-wrapper blue lighten-3">
-              <a href="index.html" class="brand-logo" id="logo">AppProtect</a>
+            <div class="nav-wrapper magenta lighten-3">
+              <a href="index.html" class="brand-logo" id="logo">AppProtect <sub>beta1</sub></a>
               <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="About_Us.html">About</a></li>
                 <div class="logged_in">
@@ -100,30 +100,63 @@
 
         <br>
         <div class="row" id="search_tab">
-            <div class="input-field col s4" id="search_block">
+            <div class="input-field col s8" id="search_block">
                 <input placeholder="Website URL" id="search_text" type="text">
             </div>
             <div id="testing_inputs" style="display:none;">
+<!--
                 <div class="input-field col s2" id="user">
                     <input placeholder="1st HTML ID" id="html_id_1" type="text">
                 </div>
+-->
+<!--
                 <div class="input-field col s2" id="pass">
                     <input placeholder="2nd HTML ID" id="html_id_2" type="text">
                 </div>
+-->
+                <select class="input-field col s2" id="db_selection">
+                    <option value="" disabled selected>Database (optional)</option>
+                    <option value="Auto">Auto</option>
+                    <option value="MySQL">MySQL</option>
+                    <option value="Oracle">Oracle</option>
+                    <option value="PostgreSQL">PostgreSQL</option>
+                    <option value="SQLite">SQLite</option>
+                </select>
+                <select class="input-field col s2" id="level_selection">
+                    <option value="" disabled selected>Test Depth (optional)</option>
+                    <option value="Auto">Auto</option>
+                    <option value=1>SHORTEST</option>
+                    <option value=2>SHORT</option>
+                    <option value=3>NORMAL</option>
+                    <option value=4>LONGER</option>
+                    <option value=5>OVER 9000</option>
+                </select>
+                <select class="input-field col s2" id="risk_selection">
+                    <option value="" disabled selected>Test Risk (optional)</option>
+                    <option value="Auto">Auto</option>
+                    <option value=1>DRIZZLE</option>
+                    <option value=2>WINDSTORM</option>
+                    <option value=3>HELLFIRE</option>
+                </select>
             </div>
             <div class="col s2" id="select_boxes">
-          <select id="type_test">
+          <select id="type_selection">
               <option value="" disabled selected>Select Test</option>
               <option value="1">ZAP</option>
               <option value="2">SQL MAP</option>
           </select>
             </div>
         <div class="col s2" id="test_button">
-        <button data-target="legal_modal" class="btn waves-effect waves-light blue lighten-3" type="submit" name="action">Test
+        <button data-target="legal_modal" class="btn waves-effect waves-light magenta lighten-3" type="submit" name="action">Test
             <i class="material-icons right">call_made</i>
         </button>
          </div>
+<!--        <br>-->
+        
 
+        </div>
+        <div class="row" id="filler_info" style="display:none; margin: 0px 0px 0px 40px;">
+           <p>This text should not appear.</p> 
         </div>
 
         <!-- end of logged in content -->
@@ -141,7 +174,7 @@
                     <input placeholder="New Password" id="ps_reg" type="password">
                 </div>
                 <div class="col s1 registration_form">
-                    <button id="regButton" class="btn waves-effect waves-light blue lighten-3">Register</button>
+                    <button id="regButton" class="btn waves-effect waves-light magenta lighten-3">Register</button>
                 </div>
             </div>
             <div class="row">
@@ -155,7 +188,7 @@
                     <input placeholder="Password" id="ps_login" type="password">
                 </div>
                 <div class="col s1 registration_form">
-                    <button id="loginButton" class="btn waves-effect waves-light blue lighten-3">Login</button>
+                    <button id="loginButton" class="btn waves-effect waves-light magenta lighten-3">Login</button>
                 </div>
             </div>
         </div>
@@ -194,14 +227,14 @@
                 </tbody>
              </table>
             <input placeholder="Add Website URL" id="ver_site" type="text">
-            <button id="verifyButton" class="btn waves-effect waves-light blue lighten-3">Verify</button>
+            <button id="verifyButton" class="btn waves-effect waves-light magenta lighten-3">Verify</button>
             </div>
         </div>
         <div class="row">
         <div id="site_name"></div>
         <div id='progress' style="display:none;">
             <div class="preloader-wrapper big active">
-                <div class="spinner-layer spinner-blue-only">
+                <div id="spinner" class="spinner-layer spinner-red-only">
                 <div class="circle-clipper left">
                 <div class="circle"></div>
                 </div><div class="gap-patch">

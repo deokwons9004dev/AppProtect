@@ -32,7 +32,7 @@ var fsx    = require("fs.extra");
 
 /* Static Module variables. */
 const minPort = 7000;    // Lowest port number available to sockets. 
-const maxPort = 7999;    // Highest port number available to sockets. 
+const maxPort = 7998;    // Highest port number available to sockets. 
 
 /* Export Variables. */
 exports.port       = minPort; // Starting port available to sockets.

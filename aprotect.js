@@ -48,6 +48,7 @@ var testtools = require("./node_helpers/test_tools.js");
 var args      = require("./node_helpers/db_args.js");
 var dbtools   = require("./node_helpers/db_tools.js"); 
 var misctools = require("./node_helpers/misc_tools.js");
+var proxytools = require("./node_helpers/proxy_tools.js");
 
 /* Import NPM Modules. */
 var express   = require("express");
@@ -74,8 +75,9 @@ var server = http.createServer(app).listen(5001, function () {
             password: MYSQL_PS
         });
         dbtools.initDB(MYSQL_ID, MYSQL_PS, client, db, function () {
-            log('Server: Ready!');
+            log('Server: Ready! v7');
         });
+        proxytools.ProxyManager();
     });
 });
 
@@ -114,17 +116,7 @@ app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     res.send(err);
-//    next(err);
 });
-// error handler
-//app.use(function(err, req, res, next) {
-//    // set locals, only providing error in development
-//    res.locals.message = err.message;
-//    res.locals.error = req.app.get('env') === 'development' ? err : {};
-//    // render the error page
-//    res.status(err.status || 500);
-//    res.render('error');
-//});
 
 
 /* Initialize Socket.io */
@@ -146,6 +138,8 @@ io.sockets.on("connection", function (socket) {
     socket.on('logout', function () {
         log('Server (Info): Socket Logout Request In.');
         usertools.logoutUser(client, socket, ss);
+        log('Server (SC LOGOUT):\n',Object.keys(sc));
+        log('Server (SS LOGOUT):\n',ss);
     });
     
     /* User Web Server Verification */
@@ -168,31 +162,37 @@ io.sockets.on("connection", function (socket) {
         testtools.testzap(client, socket, io, option);
     });
     socket.on("test_sqlmap", function (option) {
+        log('Server (Info): Socket SQLMAP Test Request In.');
         testtools.testsqlmap(client, socket, io, option);
     });
     socket.on("test_cancel", function () {
+        log('Server (Info): Socket Test Cancel Request In.');
         testtools.canceltest(socket);
     });
     
-    /* Data Fetch Features */
+    /* Data Fetch / Generation Features */
     socket.on("top_list", function () {
         log('Server (Info): Socket Top List Request In.');
         dbtools.topList(client, socket);
     });
+    socket.on("get_filler", function () {
+        log('Server (Info): Socket New Filler Request In.');
+        testtools.newSocketFiller(socket);
+    });
 
-    /* Receives a notification that a client socket left.
-     *
-     * @param none.
-     *
-     * @results none.
-     */
+    /* Disconnect a leaving socket. */
     socket.on("disconnect", function () {
         log("Server (Info): Client (%s) left.", socket.id);
         delete sc[socket.id]; // Remove the socket from the Socket Client Dictionary.
+        log('Server (SC DIS):\n',Object.keys(sc));
+        log('Server (SS DIS):\n',ss);
     });
 
     socket.leave(socket.id);
     sc[socket.id] = socket; // Add every socket connection to the Socket Client Dictionary.
 
-    log("SIO: New Client:", misctools.parseCookies(socket.handshake.headers.cookie));
+    log("Server (Info)  : New Client ID     :", socket.id);
+    log('Server (Info)  : New Client Cookies:', misctools.parseCookies(socket.handshake.headers.cookie));
+    log('Server (SC NEW):',Object.keys(sc));
+    log('Server (SS NEW):',ss);
 });
