@@ -5,7 +5,7 @@ socket.on('verify_token_reject', function (error) {
 	alert('Verification Token Fetch Failed.\n' + error); 
 });
 socket.on('verify_token_success', function (token) {
-	alert('Verification Token successfully fetched.');
+//	alert('Verification Token successfully fetched.');
 	saveAs(new Blob(['']), token);
 });
 
@@ -13,7 +13,7 @@ socket.on('get_verified_sites_reject', function (error) {
 	alert('Verified Sites Fetch Failed.\n' + error); 
 });
 socket.on('get_verified_sites_success', function (sites) {
-	alert('Verified Sites successfully fetched.');
+//	alert('Verified Sites successfully fetched.');
 	$('#vsiteTable').css('display', 'table');
 	sites.forEach(function (site) {
 		var row       = $('<tr></tr>');
@@ -38,7 +38,7 @@ socket.on('remove_verified_site_reject', function (error) {
 	alert('Failed to remove verified site.\n' + error); 
 });
 socket.on('remove_verified_site_success', function () {
-	alert('Successfully removed verified site.');
+//	alert('Successfully removed verified site.');
 	getVerifiedSites();
 });
 

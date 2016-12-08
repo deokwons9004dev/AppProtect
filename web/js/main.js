@@ -1,8 +1,11 @@
-$(window).unload(function () {
-    socket.emit('logout');
-});
+//$(window).on('beforeunload',function () {
+//  socket.emit('logout');
+//  return;
+//});
 
 $(document).ready(function() {
+  
+  
   
   /* Hide User Panels By Default.
    * 
@@ -113,14 +116,22 @@ $(document).ready(function() {
   //   $('#disagree_terms_button').click(function () {
 
   //   });
-    $( '#type_test' ).change(function() {
-    	var x = $( "select option:selected" ).text();
+    $( '#type_selection' ).change(function() {
+    	var x = $( "#type_selection option:selected" ).text();
     	if(x=="ZAP"){
+        $('#search_block').removeClass('s2').addClass('s8');
+      
     		$("#search_block").show();
-    		$("#testing_inputs").hide();
+    
+  		  $("#testing_inputs").hide();
+        $("#filler_info").hide();
   		}else{
+        $('#search_block').removeClass('s8').addClass('s2');
+        
   			$("#testing_inputs").show();
-  			// $("#search_block").hide();
+  			$("#filler_info").show();
+  
+        socket.emit('get_filler'); // Listeners in ap_pentest.js
   		}
 		});
 
